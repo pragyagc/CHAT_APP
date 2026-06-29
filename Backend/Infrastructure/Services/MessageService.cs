@@ -1,53 +1,69 @@
-﻿using Application.DTOs.Messages;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Domain.Entities;
-using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services;
 
-public class MessageService
-    : IMessageService
+public class MessageService : IMessageService
 {
-    private readonly ChatDbContext _db;
+    private readonly IMessageRepository _repository;
 
-    public MessageService(
-        ChatDbContext db)
+    public MessageService(IMessageRepository repository)
     {
-        _db = db;
+        _repository = repository;
     }
 
-    public async Task<Message>
-        SendAsync(
-            SendMessageRequest request)
+    public async Task<Message> SendAsync(
+        Guid senderId,
+        Guid conversationId,
+        string text)
     {
         var message = new Message
         {
             Id = Guid.NewGuid(),
-            ConversationId =
-                request.ConversationId,
-            SenderId =
-                request.SenderId,
-            Text = request.Text,
+
+            SenderId = senderId,
+
+            ConversationId = conversationId,
+
+            Text = text,
+
             SentAt = DateTime.UtcNow,
+
+            CreatedAt = DateTime.UtcNow,
+
             IsSeen = false
         };
 
-        _db.Messages.Add(message);
+        await _repository.AddAsync(message);
 
-        await _db.SaveChangesAsync();
+        await _repository.SaveAsync();
 
         return message;
     }
 
-    public async Task<List<Message>>
-        GetConversationMessagesAsync(
-            Guid conversationId)
+    public async Task<List<Message>> GetConversationMessagesAsync(
+        Guid conversationId)
     {
-        return await _db.Messages
-            .Where(x =>
-                x.ConversationId ==
-                conversationId)
-            .ToListAsync();
+        return await _repository
+            .GetByConversationIdAsync(conversationId);
+    }
+
+    public async Task<Message?> GetByIdAsync(Guid id)
+    {
+        return await _repository.GetByIdAsync(id);
+    }
+
+    public async Task MarkAsSeenAsync(Guid messageId)
+    {
+        var message =
+            await _repository.GetByIdAsync(messageId);
+
+        if (message == null)
+            return;
+
+        message.IsSeen = true;
+        message.SeenAt = DateTime.UtcNow;
+
+        await _repository.SaveAsync();
     }
 }

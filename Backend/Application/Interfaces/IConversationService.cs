@@ -1,12 +1,14 @@
-﻿using Application.DTOs.Conversations;
-using Domain.Entities;
+﻿using Domain.Entities;
+using Application.DTOs.Conversations;
 
 namespace Application.Interfaces;
 
 public interface IConversationService
 {
-    Task<Conversation> CreateAsync(
-        CreateConversationRequest request);
+    Task<Conversation> CreateAsync(Guid userId, Guid otherUserId);
+    Task<List<ConversationDto>> GetAllAsync(Guid currentuserId);
 
-    Task<List<Conversation>> GetAllAsync();
+    Task<Conversation?> GetByIdAsync(Guid id);
+
+    Task<bool> IsParticipantAsync(Guid conversationId, Guid userId);
 }

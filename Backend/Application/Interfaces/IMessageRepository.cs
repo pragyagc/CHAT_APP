@@ -4,9 +4,9 @@ namespace Application.Interfaces;
 
 public interface IMessageRepository
 {
-    Task<Message> AddAsync(Message message);
+    Task AddAsync(Message message);
+    Task<List<Message>> GetByConversationIdAsync(Guid conversationId);
+    Task<Message?> GetByIdAsync(Guid id);
+    Task SaveAsync();
 
-    Task<List<Message>>
-        GetConversationMessagesAsync(
-            Guid conversationId);
 }

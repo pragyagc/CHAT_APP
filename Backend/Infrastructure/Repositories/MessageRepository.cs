@@ -5,8 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class MessageRepository
-    : IMessageRepository
+public class MessageRepository : IMessageRepository
 {
     private readonly ChatDbContext _db;
 
@@ -15,23 +14,29 @@ public class MessageRepository
         _db = db;
     }
 
-    public async Task<Message> AddAsync(
-        Message message)
+    public async Task AddAsync(Message message)
     {
-        _db.Messages.Add(message);
-
-        await _db.SaveChangesAsync();
-
-        return message;
+        await _db.Messages.AddAsync(message);
     }
 
-    public async Task<List<Message>>
-        GetConversationMessagesAsync(
-            Guid conversationId)
+    public async Task<List<Message>> GetByConversationIdAsync(Guid conversationId)
     {
         return await _db.Messages
-            .Where(x =>
-                x.ConversationId == conversationId)
+            .Where(m => m.ConversationId == conversationId)
+            .OrderBy(m => m.SentAt)           // oldest → newest
+            .Include(m => m.Sender)           // sender information
             .ToListAsync();
+    }
+
+    public async Task<Message?> GetByIdAsync(Guid id)
+    {
+        return await _db.Messages
+            .Include(m => m.Sender)
+            .FirstOrDefaultAsync(m => m.Id == id);
+    }
+
+    public async Task SaveAsync()
+    {
+        await _db.SaveChangesAsync();
     }
 }

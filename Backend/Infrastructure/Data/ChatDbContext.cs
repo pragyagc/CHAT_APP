@@ -26,17 +26,27 @@ public class ChatDbContext
 
         builder.Entity<Message>()
             .HasOne(m => m.Sender)
-            .WithMany(u => u.SentMessages)
+            .WithMany()
             .HasForeignKey(m => m.SenderId);
 
-        builder.Entity<ConversationParticipant>()
-            .HasOne(cp => cp.User)
-            .WithMany(u => u.Conversations)
-            .HasForeignKey(cp => cp.UserId);
+        builder.Entity<Conversation>()
+            .HasMany(c => c.Messages)
+            .WithOne(m => m.Conversation)
+            .HasForeignKey(m => m.ConversationId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Entity<ConversationParticipant>()
-        .HasOne(cp => cp.Conversation)
-        .WithMany(c => c.Participants)
-        .HasForeignKey(cp => cp.ConversationId);
+        builder.Entity<ConversationParticipant>(entity =>
+        {
+            entity.HasKey(cp => new { cp.ConversationId, cp.UserId });
+
+            entity.HasOne(cp => cp.Conversation)
+                .WithMany(c => c.Participants)
+                .HasForeignKey(cp => cp.ConversationId);
+
+            entity.HasOne(cp => cp.User)
+                .WithMany()
+                .HasForeignKey(cp => cp.UserId);
+        });
     }
+
 }

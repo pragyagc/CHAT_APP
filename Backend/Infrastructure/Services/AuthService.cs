@@ -58,7 +58,7 @@ public class AuthService : IAuthService
 
         
 
-        var token = await _jwtTokenGenerator.Generate(user);
+        var token = _jwtTokenGenerator.Generate(user);
 
         return new LoginResponse
         {

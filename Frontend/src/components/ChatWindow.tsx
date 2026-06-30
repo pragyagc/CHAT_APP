@@ -9,7 +9,7 @@ export default function ChatWindow({ conversation }: any) {
   const [hasNewMessages, setHasNewMessages] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
-
+  const [isOnline, setIsOnline] = useState(false);
   const isAtBottomRef = useRef(true);
   const isTabActiveRef = useRef(true);
 
@@ -63,7 +63,29 @@ export default function ChatWindow({ conversation }: any) {
     }
 
     await connection.invoke("JoinConversation", conversation.id);
+    // Get current online status
+const online = await connection.invoke(
+  "IsUserOnline",
+  conversation.otherUserId
+);
 
+setIsOnline(online);
+
+// Listen for online/offline events
+connection.off("UserOnline");
+connection.off("UserOffline");
+
+connection.on("UserOnline", (userId: string) => {
+  if (userId === conversation.otherUserId) {
+    setIsOnline(true);
+  }
+});
+
+connection.on("UserOffline", (userId: string) => {
+  if (userId === conversation.otherUserId) {
+    setIsOnline(false);
+  }
+});
     connection.off("ReceiveMessage");
 
     connection.on("ReceiveMessage", (msg: any) => {
@@ -137,6 +159,9 @@ connection.on("ConversationUpdated", (updatedMessages: any[]) => {
       connection.invoke("LeaveConversation", conversation.id).catch(() => {});
       connection.off("ReceiveMessage");
       connection.off("MessagesSeen");
+       connection.off("ConversationUpdated");
+  connection.off("UserOnline");
+  connection.off("UserOffline");
     };
   }, [conversation?.id]);
 
@@ -149,7 +174,57 @@ connection.on("ConversationUpdated", (updatedMessages: any[]) => {
         position: "relative",
       }}
     >
-      <h3>{conversation.otherUserName}</h3>
+      <div className="chat-header">
+
+  <div className="chat-user">
+
+    <div className="avatar-wrapper">
+
+      <div className="avatar">
+        {conversation.otherUserName.charAt(0).toUpperCase()}
+      </div>
+
+      <div
+        className={`online-dot ${
+          isOnline ? "online" : "offline"
+        }`}
+      />
+
+    </div>
+
+    <div>
+
+      <div className="user-name">
+        {conversation.otherUserName}
+      </div>
+
+      <div
+        className={`user-status ${
+          isOnline
+            ? "status-online"
+            : "status-offline"
+        }`}
+      >
+        {isOnline ? "Online" : "Offline"}
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="chat-actions">
+
+    <button className="chat-action-btn">
+      📞
+    </button>
+
+    <button className="chat-action-btn">
+      📹
+    </button>
+
+  </div>
+
+</div>
 
       {/* MESSAGES */}
       <div

@@ -21,7 +21,21 @@ public class ChatHub : Hub
 
     public override async Task OnConnectedAsync()
     {
+        var id = Context.User?
+        .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (id != null)
+        {
+            var userId = Guid.Parse(id);
+
+            OnlineUsers.Add(userId, Context.ConnectionId);
+
+            await Clients.All.SendAsync(
+                "UserOnline",
+                userId);
+        }
         Console.WriteLine($"SignalR Connected : {Context.ConnectionId}");
+
 
         await base.OnConnectedAsync();
     }
@@ -29,6 +43,21 @@ public class ChatHub : Hub
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         Console.WriteLine($"SignalR Disconnected : {Context.ConnectionId}");
+        var id = Context.User?
+       .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (id != null)
+        {
+            var userId = Guid.Parse(id);
+
+            OnlineUsers.Remove(Context.ConnectionId);
+
+            await Clients.All.SendAsync(
+                "UserOffline",
+                userId);
+        }
+        
+        await base.OnDisconnectedAsync(exception);
 
         await base.OnDisconnectedAsync(exception);
     }
@@ -122,5 +151,9 @@ public class ChatHub : Hub
 
         await Clients.Group(conversationId.ToString())
             .SendAsync("ConversationUpdated", messages);
+    }
+    public bool IsUserOnline(Guid userId)
+    {
+        return OnlineUsers.IsOnline(userId);
     }
 }

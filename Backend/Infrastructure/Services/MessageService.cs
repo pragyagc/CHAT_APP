@@ -66,4 +66,21 @@ public class MessageService : IMessageService
 
         await _repository.SaveAsync();
     }
+
+    public async Task MarkConversationAsSeen(Guid conversationId, Guid userId)
+    {
+        var messages = await _repository.GetByConversationIdAsync(conversationId);
+
+        var unseenMessages = messages
+            .Where(m => m.SenderId != userId && !m.IsSeen)
+            .ToList();
+
+        foreach (var msg in unseenMessages)
+        {
+            msg.IsSeen = true;
+            msg.SeenAt = DateTime.UtcNow;
+        }
+
+        await _repository.SaveAsync();
+    }
 }

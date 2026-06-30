@@ -11,4 +11,5 @@ public interface IMessageService
     Task<Message?> GetByIdAsync(Guid id);
 
     Task MarkAsSeenAsync(Guid messageId);
+    Task MarkConversationAsSeen(Guid conversationId, Guid userId);
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ApiwebService } from "../services";
 import { connection } from "../signalr/connection";
 
@@ -6,11 +6,128 @@ export default function ChatWindow({ conversation }: any) {
   const [messages, setMessages] = useState<any[]>([]);
   const [text, setText] = useState("");
   const [currentUserId, setCurrentUserId] = useState("");
+  const [hasNewMessages, setHasNewMessages] = useState(false);
 
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  const isAtBottomRef = useRef(true);
+  const isTabActiveRef = useRef(true);
+
+  // ---------------- USER ----------------
+  async function loadCurrentUser() {
+    const me = await ApiwebService.getUsersMe();
+    setCurrentUserId(me.id);
+  }
+
+  // ---------------- SCROLL ----------------
+  const checkIfAtBottom = () => {
+    const el = scrollRef.current;
+    if (!el) return true;
+
+    return el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+  };
+
+  const scrollToBottom = (smooth = true) => {
+    scrollRef.current?.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: smooth ? "smooth" : "auto",
+    });
+  };
+
+  // ---------------- MARK AS SEEN (SAFE) ----------------
+  const markAsSeen = () => {
+    if (!isTabActiveRef.current) return;
+    if (!conversation?.id) return;
+
+    connection.invoke("MarkAsSeen", conversation.id).catch(() => {});
+  };
+
+  // ---------------- LOAD MESSAGES ----------------
+  async function loadMessages() {
+    const data = await ApiwebService.getMessagesConversation(
+      conversation.id
+    );
+
+    setMessages(data ?? []);
+
+    setTimeout(() => {
+      scrollToBottom(false);
+      markAsSeen(); // IMPORTANT: mark seen on open
+    }, 50);
+  }
+
+  // ---------------- JOIN CHAT ----------------
+  async function joinChat() {
+    if (connection.state === "Disconnected") {
+      await connection.start();
+    }
+
+    await connection.invoke("JoinConversation", conversation.id);
+
+    connection.off("ReceiveMessage");
+
+    connection.on("ReceiveMessage", (msg: any) => {
+      if (msg.conversationId !== conversation.id) return;
+
+      setMessages((prev) => [...prev, msg]);
+
+      if (isAtBottomRef.current) {
+        setTimeout(() => {
+          scrollToBottom();
+          markAsSeen();
+        }, 50);
+      } else {
+        setHasNewMessages(true);
+      }
+    });
+
+  connection.off("ConversationUpdated");
+
+connection.on("ConversationUpdated", (updatedMessages: any[]) => {
+    setMessages(updatedMessages);
+});
+
+
+  }
+
+  // ---------------- SEND MESSAGE ----------------
+  async function sendMessage() {
+    if (!text.trim()) return;
+
+    await connection.invoke("SendMessage", conversation.id, text);
+
+    setText("");
+
+    setTimeout(() => scrollToBottom(), 50);
+  }
+
+  // ---------------- TAB VISIBILITY FIX ----------------
+  useEffect(() => {
+    const handleVisibility = () => {
+      isTabActiveRef.current =
+        document.visibilityState === "visible";
+
+      if (isTabActiveRef.current) {
+        markAsSeen();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibility
+      );
+    };
+  }, []);
+
+  // ---------------- INIT ----------------
   useEffect(() => {
     if (!conversation?.id) return;
 
     setMessages([]);
+    setHasNewMessages(false);
 
     loadCurrentUser();
     loadMessages();
@@ -19,74 +136,9 @@ export default function ChatWindow({ conversation }: any) {
     return () => {
       connection.invoke("LeaveConversation", conversation.id).catch(() => {});
       connection.off("ReceiveMessage");
+      connection.off("MessagesSeen");
     };
   }, [conversation?.id]);
-
-  // ---------------- CURRENT USER ----------------
-  async function loadCurrentUser() {
-    try {
-      const me = await ApiwebService.getUsersMe();
-
-      console.log("Current User:", me);
-
-      setCurrentUserId(me.id);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  // ---------------- JOIN ----------------
-  async function joinChat() {
-    try {
-      if (connection.state === "Disconnected") {
-        await connection.start();
-      }
-
-      await connection.invoke("JoinConversation", conversation.id);
-
-      connection.off("ReceiveMessage");
-
-      connection.on("ReceiveMessage", (msg: any) => {
-        if (msg.conversationId === conversation.id) {
-          setMessages((prev) => [...prev, msg]);
-        }
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  // ---------------- LOAD HISTORY ----------------
-  async function loadMessages() {
-    try {
-      const data = await ApiwebService.getMessagesConversation(
-        conversation.id
-      );
-
-      console.log("Messages:", data);
-
-      setMessages(data ?? []);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  // ---------------- SEND ----------------
-  async function sendMessage() {
-    if (!text.trim()) return;
-
-    try {
-      await connection.invoke(
-        "SendMessage",
-        conversation.id,
-        text
-      );
-
-      setText("");
-    } catch (err) {
-      console.error(err);
-    }
-  }
 
   return (
     <div
@@ -94,12 +146,22 @@ export default function ChatWindow({ conversation }: any) {
         display: "flex",
         flexDirection: "column",
         height: "100%",
+        position: "relative",
       }}
     >
       <h3>{conversation.otherUserName}</h3>
 
-      {/* Messages */}
+      {/* MESSAGES */}
       <div
+        ref={scrollRef}
+        onScroll={() => {
+          isAtBottomRef.current = checkIfAtBottom();
+
+          if (isAtBottomRef.current) {
+            setHasNewMessages(false);
+            markAsSeen();
+          }
+        }}
         style={{
           flex: 1,
           overflowY: "auto",
@@ -107,66 +169,90 @@ export default function ChatWindow({ conversation }: any) {
           background: "#f5f5f5",
         }}
       >
-        {messages.length === 0 ? (
-          <p>No messages yet.</p>
-        ) : (
-          messages.map((m) => {
-            const isMine = m.senderId === currentUserId;
+        {messages.map((m) => {
+          const isMine = m.senderId === currentUserId;
 
-            return (
+          return (
+            <div
+              key={m.id}
+              style={{
+                display: "flex",
+                justifyContent: isMine
+                  ? "flex-end"
+                  : "flex-start",
+                marginBottom: "10px",
+              }}
+            >
               <div
-                key={m.id}
                 style={{
-                  display: "flex",
-                  justifyContent: isMine
-                    ? "flex-end"
-                    : "flex-start",
-                  marginBottom: "10px",
+                  background: isMine ? "#0084ff" : "#e4e6eb",
+                  color: isMine ? "#fff" : "#000",
+                  padding: "10px 15px",
+                  borderRadius: "18px",
+                  maxWidth: "60%",
+                  wordBreak: "break-word",
                 }}
               >
+                {m.text}
+
+                {/* TIME */}
                 <div
                   style={{
-                    background: isMine
-                      ? "#0084ff"
-                      : "#e4e6eb",
-                    color: isMine
-                      ? "#fff"
-                      : "#000",
-                    padding: "10px 15px",
-                    borderRadius: "18px",
-                    maxWidth: "60%",
-                    wordBreak: "break-word",
-                    boxShadow:
-                      "0 1px 3px rgba(0,0,0,.15)",
+                    fontSize: "11px",
+                    opacity: 0.7,
+                    marginTop: 4,
+                    textAlign: "right",
                   }}
                 >
-                  {m.text}
-
-                  {m.createdAt && (
-                    <div
-                      style={{
-                        fontSize: "11px",
-                        marginTop: "5px",
-                        textAlign: "right",
-                        opacity: 0.7,
-                      }}
-                    >
-                      {new Date(
-                        m.createdAt
-                      ).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </div>
-                  )}
+                  {m.createdAt &&
+                    new Date(m.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                 </div>
+
+                {/* SENT / SEEN */}
+                {isMine && (
+                  <div
+                    style={{
+                      fontSize: "11px",
+                      marginTop: 2,
+                      textAlign: "right",
+                    }}
+                  >
+                    {m.isSeen ? "✓✓ Seen" : "✓ Sent"}
+                  </div>
+                )}
               </div>
-            );
-          })
-        )}
+            </div>
+          );
+        })}
       </div>
 
-      {/* Input */}
+      {/* NEW MESSAGE BUTTON */}
+      {hasNewMessages && (
+        <div
+          onClick={() => {
+            scrollToBottom();
+            setHasNewMessages(false);
+          }}
+          style={{
+            position: "absolute",
+            bottom: 90,
+            right: 20,
+            background: "#0084ff",
+            color: "#fff",
+            padding: "8px 12px",
+            borderRadius: "20px",
+            cursor: "pointer",
+            fontSize: "12px",
+          }}
+        >
+          New messages ↓
+        </div>
+      )}
+
+      {/* INPUT */}
       <div
         style={{
           display: "flex",
@@ -177,28 +263,14 @@ export default function ChatWindow({ conversation }: any) {
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Type a message..."
           style={{
             flex: 1,
             padding: "10px",
             borderRadius: "20px",
-            border: "1px solid #ccc",
-            outline: "none",
           }}
         />
 
-        <button
-          onClick={sendMessage}
-          style={{
-            marginLeft: "10px",
-            padding: "10px 20px",
-            borderRadius: "20px",
-            border: "none",
-            background: "#0084ff",
-            color: "#fff",
-            cursor: "pointer",
-          }}
-        >
+        <button onClick={sendMessage} style={{ marginLeft: 10 }}>
           Send
         </button>
       </div>

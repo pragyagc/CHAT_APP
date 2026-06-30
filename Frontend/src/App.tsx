@@ -62,7 +62,7 @@ const [currentUser, setCurrentUser] = useState<any>(null);
       console.error(err);
     }
 
-    connection.start().catch(() => {});
+   
 
     setLoading(false);
   }

@@ -100,4 +100,27 @@ public class ChatHub : Hub
             .Group(conversationId.ToString())
             .SendAsync("ReceiveMessage", message);
     }
+
+    public async Task MarkAsSeen(Guid conversationId)
+    {
+        var userIdValue = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (userIdValue == null)
+            throw new HubException("Unauthorized");
+
+        var userId = Guid.Parse(userIdValue);
+
+        var allowed = await _conversationService.IsParticipantAsync(conversationId, userId);
+
+        if (!allowed)
+            throw new HubException("Not allowed");
+
+        await _messageService.MarkConversationAsSeen(conversationId, userId);
+
+        // Get updated messages from DB
+        var messages = await _messageService.GetConversationMessagesAsync(conversationId);
+
+        await Clients.Group(conversationId.ToString())
+            .SendAsync("ConversationUpdated", messages);
+    }
 }

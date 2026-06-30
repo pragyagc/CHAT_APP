@@ -21,9 +21,11 @@ export default function UserList({
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+useEffect(() => {
+  if (currentUserId) {
     loadUsers();
-  }, []);
+  }
+}, [currentUserId]);
 
   async function loadUsers() {
     try {

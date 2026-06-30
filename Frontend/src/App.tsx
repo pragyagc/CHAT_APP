@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import ChatWindow from "./components/ChatWindow";
 import ConversationList from "./components/ConversationList";
 import UserList from "./components/UserList";
@@ -11,10 +12,10 @@ import { connection } from "./signalr/connection";
 export default function App() {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+const [showRegister, setShowRegister] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState<any>(null);
-
+const [currentUser, setCurrentUser] = useState<any>(null);
   const [currentUserId, setCurrentUserId] = useState<string>("");
 
   // ---------------- TOKEN CHECK ----------------
@@ -28,24 +29,46 @@ export default function App() {
   };
 
   // ---------------- INIT ----------------
-  useEffect(() => {
+ useEffect(() => {
+  async function initialize() {
     const token = localStorage.getItem("token");
 
     if (!token || !validateToken(token)) {
       localStorage.removeItem("token");
       setIsLoggedIn(false);
-    } else {
-      OpenAPI.TOKEN = token;
-      setIsLoggedIn(true);
-
-      const decoded: any = jwtDecode(token);
-      setCurrentUserId(decoded?.nameid || decoded?.sub || "");
-
-      connection.start().catch(() => {});
+      setLoading(false);
+      return;
     }
 
+    OpenAPI.TOKEN = token;
+    setIsLoggedIn(true);
+
+   
+    try {
+      const me = await ApiwebService.getUsersMe();
+
+     setCurrentUser(me);
+      console.log(me);
+
+      // Use database id instead of JWT id
+      setCurrentUserId(me.id);
+       setIsLoggedIn(true);
+
+      if (connection.state === "Disconnected") {
+        await connection.start();
+      }
+
+    } catch (err) {
+      console.error(err);
+    }
+
+    connection.start().catch(() => {});
+
     setLoading(false);
-  }, []);
+  }
+
+  initialize();
+}, []);
 
   // ---------------- LOGIN ----------------
   const handleLogin = async (email: string, password: string) => {
@@ -60,9 +83,9 @@ export default function App() {
 
     localStorage.setItem("token", token);
     OpenAPI.TOKEN = token;
+    const me = await ApiwebService.getUsersMe();
+      setCurrentUser(me); 
 
-    const decoded: any = jwtDecode(token);
-    setCurrentUserId(decoded?.nameid || decoded?.sub || "");
 
     if (connection.state === "Disconnected") {
       await connection.start();
@@ -70,6 +93,29 @@ export default function App() {
 
     setIsLoggedIn(true);
   };
+
+
+const handleRegister = async (
+  email: string,
+  password: string,
+  userName: string
+) => {
+  try {
+    await ApiwebService.postAuthRegister({
+      email,
+      password,
+      userName,
+    });
+
+    alert("Registration successful. Please login.");
+
+    setShowRegister(false);
+  } catch (err) {
+    console.error(err);
+    alert("Registration failed");
+  }
+};
+
 
   // ---------------- LOGOUT ----------------
   const logout = async () => {
@@ -87,16 +133,75 @@ export default function App() {
   if (loading) return <div>Loading...</div>;
 
   // ---------------- LOGIN SCREEN ----------------
-  if (!isLoggedIn) {
-    return <Login onLogin={handleLogin} goToRegister={() => {}} />;
-  }
-
+if (!isLoggedIn) {
+  return showRegister ? (
+    <Register
+      onRegister={handleRegister}
+      goToLogin={() => setShowRegister(false)}
+    />
+  ) : (
+    <Login
+      onLogin={handleLogin}
+      goToRegister={() => setShowRegister(true)}
+    />
+  );
+}
   // ---------------- MAIN CHAT UI ----------------
   return (
     <div style={{ display: "flex", height: "100vh" }}>
 
-      {/* LEFT PANEL */}
-      <div style={{ width: 320, borderRight: "1px solid #ddd", padding: 10 }}>
+      <div
+  style={{
+    width: 330,
+    borderRight: "1px solid #ddd",
+    display: "flex",
+    flexDirection: "column",
+    background: "#fafafa",
+  }}
+>
+{/* for username */}
+<div
+  style={{
+    padding: 20,
+    borderBottom: "1px solid #ddd",
+    display: "flex",
+    alignItems: "center",
+    gap: 15,
+  }}
+>
+  <div
+    style={{
+      width: 50,
+      height: 50,
+      borderRadius: "50%",
+      background: "#0084ff",
+      color: "white",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      fontWeight: "bold",
+      fontSize: 20,
+    }}
+  >
+    {currentUser?.userName?.charAt(0).toUpperCase()}
+  </div>
+
+  <div>
+    <div style={{ fontWeight: "bold" }}>
+      {currentUser?.userName}
+    </div>
+
+    <div
+      style={{
+        color: "gray",
+        fontSize: 13,
+      }}
+    >
+      {currentUser?.email}
+    </div>
+  </div>
+</div>
+
 
         {/* EXISTING CONVERSATIONS */}
         <ConversationList

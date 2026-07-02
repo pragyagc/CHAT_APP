@@ -45,6 +45,22 @@ requestBody: LoginRequest,
     }
 
     /**
+     * @param requestBody 
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static postAuthAdminLogin(
+requestBody: LoginRequest,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/auth/admin/login',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
      * @returns any OK
      * @throws ApiError
      */
@@ -63,6 +79,96 @@ requestBody: LoginRequest,
         return __request(OpenAPI, {
             method: 'GET',
             url: '/users/me',
+        });
+    }
+
+    /**
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static getAdminDashboard(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/admin/dashboard',
+        });
+    }
+
+    /**
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static getAdminUsers(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/admin/users',
+        });
+    }
+
+    /**
+     * @param id 
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static getAdminUsers1(
+id: string,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/admin/users/{id}',
+            path: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
+     * @param id 
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static deleteAdminUsers(
+id: string,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/admin/users/{id}',
+            path: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
+     * @param id 
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static putAdminUsersBlock(
+id: string,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/admin/users/{id}/block',
+            path: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
+     * @param id 
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static putAdminUsersUnblock(
+id: string,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/admin/users/{id}/unblock',
+            path: {
+                'id': id,
+            },
         });
     }
 

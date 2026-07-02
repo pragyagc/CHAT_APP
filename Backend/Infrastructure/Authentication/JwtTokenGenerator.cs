@@ -16,14 +16,14 @@ namespace Infrastructure.Authentication
             _configuration = configuration;
         }
 
-        public string Generate(User user)
+        public string Generate(User user,string role)
         {
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email ?? ""),
                 new Claim(ClaimTypes.Name, user.UserName ?? ""),
-                new Claim(ClaimTypes.Role, "User")
+                new Claim(ClaimTypes.Role, role)
             };
 
             var key = new SymmetricSecurityKey(

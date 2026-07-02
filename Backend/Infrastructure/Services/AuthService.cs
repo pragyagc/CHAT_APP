@@ -56,9 +56,41 @@ public class AuthService : IAuthService
         if (!result.Succeeded)
             return null;
 
-        
+        // Prevent admins from using the user login
+        if (await _userManager.IsInRoleAsync(user, "Admin"))
+        {
+            throw new UnauthorizedAccessException(
+                "Please log in through the admin portal.");
+        }
 
-        var token = _jwtTokenGenerator.Generate(user);
+        var token = _jwtTokenGenerator.Generate(user,"User");
+
+        return new LoginResponse
+        {
+            Token = token
+        };
+    }
+
+    public async Task<LoginResponse?> AdminLoginAsync(LoginRequest request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email);
+
+        if (user == null)
+            return null;
+
+        var result = await _signInManager.CheckPasswordSignInAsync(
+            user,
+            request.Password,
+            false);
+
+        if (!result.Succeeded)
+            return null;
+
+        // Check if the user is an Admin
+        if (!await _userManager.IsInRoleAsync(user, "Admin"))
+            return null;
+
+        var token = _jwtTokenGenerator.Generate(user,"Admin");
 
         return new LoginResponse
         {

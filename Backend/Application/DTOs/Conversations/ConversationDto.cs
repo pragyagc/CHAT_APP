@@ -13,4 +13,8 @@ public class ConversationDto
     public string LastMessage { get; set; } = string.Empty;
 
     public DateTime? LastMessageTime { get; set; }
+
+    public bool IsReadOnly { get; set; }
+
+    public bool IsAdminConversation { get; set; }
 }

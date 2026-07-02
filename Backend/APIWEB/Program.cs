@@ -47,6 +47,8 @@ builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddScoped<JwtTokenGenerator>();
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 
 #endregion
 
@@ -151,6 +153,7 @@ builder.Services.AddCors(options =>
 
 #endregion
 
+# region SignalR
 builder.Services.AddSignalR();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
@@ -160,6 +163,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 
 var app = builder.Build();
+
+#endregion
 
 #region Seed Roles
 
@@ -200,7 +205,8 @@ var users = app.MapGroup("/users")
     .RequireAuthorization();
 
 var admin = app.MapGroup("/admin")
-    .RequireAuthorization();
+    .RequireAuthorization(policy=>policy.RequireRole("Admin"));
+    
 
 var conversations = app.MapGroup("/conversations")
     .RequireAuthorization();
@@ -229,8 +235,20 @@ async (
         await authService.LoginAsync(request);
 
     return result == null
-        ? Results.BadRequest()
+        ? Results.BadRequest("Invalid user credentials")
         : Results.Ok(result);
+});
+
+auth.MapPost("/admin/login",
+async (LoginRequest request,IAuthService authService) =>
+{
+    var result =await authService.AdminLoginAsync(request);
+
+    return result == null
+        ? Results.BadRequest("Invalid admin credentials.")
+        : Results.Ok(result);
+         
+
 });
 
 #endregion
@@ -261,12 +279,8 @@ IUserService service) =>
 
 #region CONVERSATIONS
 
-conversations.MapGet("/",
-async (
-ClaimsPrincipal user,
-IConversationService service) =>
-{
-    var id =
+conversations.MapGet("/",async (ClaimsPrincipal user,IConversationService service) =>
+{var id =
         Guid.Parse(
             user.FindFirstValue(
                 ClaimTypes.NameIdentifier)!);
@@ -275,11 +289,7 @@ IConversationService service) =>
         await service.GetAllAsync(id));
 });
 
-conversations.MapPost("/{otherUserId:guid}",
-async (
-Guid otherUserId,
-ClaimsPrincipal user,
-IConversationService service) =>
+conversations.MapPost("/{otherUserId:guid}",async (Guid otherUserId,ClaimsPrincipal user,IConversationService service) =>
 {
     var id =
         Guid.Parse(
@@ -322,6 +332,74 @@ IMessageService service) =>
     return Results.Ok(
         await service.GetConversationMessagesAsync(
             conversationId));
+});
+
+#endregion
+
+
+#region ADMIN
+
+admin.MapGet("/dashboard",
+async (IAdminService service) =>
+{
+    return Results.Ok(await service.GetDashboardAsync());
+});
+
+admin.MapGet("/users",
+async (IAdminService service) =>
+{
+    return Results.Ok(await service.GetAllUsersAsync());
+});
+
+admin.MapGet("/users/{id:guid}",
+async (
+Guid id,
+IAdminService service) =>
+{
+    var user = await service.GetUserInfoAsync(id);
+
+    return user == null
+        ? Results.NotFound()
+        : Results.Ok(user);
+});
+
+admin.MapPut("/users/{id:guid}/block",
+async (
+Guid id,
+IAdminService service) =>
+{
+    await service.BlockUserAsync(id);
+
+    return Results.Ok(new
+    {
+        Message = "User blocked successfully."
+    });
+});
+
+admin.MapPut("/users/{id:guid}/unblock",
+async (
+Guid id,
+IAdminService service) =>
+{
+    await service.UnblockUserAsync(id);
+
+    return Results.Ok(new
+    {
+        Message = "User unblocked successfully."
+    });
+});
+
+admin.MapDelete("/users/{id:guid}",
+async (
+Guid id,
+IAdminService service) =>
+{
+    await service.DeleteUserAsync(id);
+
+    return Results.Ok(new
+    {
+        Message = "User deleted successfully."
+    });
 });
 
 #endregion

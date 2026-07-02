@@ -1,22 +1,47 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Services;
 
 public class MessageService : IMessageService
 {
     private readonly IMessageRepository _repository;
+    private readonly IConversationRepository _conversationRepository;
+    private readonly UserManager<User> _userManager;
 
-    public MessageService(IMessageRepository repository)
+    public MessageService(IMessageRepository repository,IConversationRepository conversationRepository,UserManager<User> userManager)
     {
         _repository = repository;
+        _conversationRepository = conversationRepository;
+        _userManager = userManager;
     }
 
-    public async Task<Message> SendAsync(
-        Guid senderId,
-        Guid conversationId,
-        string text)
+    public async Task<Message> SendAsync(Guid senderId,Guid conversationId,string text)
     {
+        var conversation = await _conversationRepository.GetByIdAsync(conversationId);
+        Console.WriteLine("================================");
+        Console.WriteLine($"ConversationId: {conversationId}");
+        Console.WriteLine($"IsReadOnly: {conversation?.IsReadOnly}");
+        Console.WriteLine($"IsAdminConversation: {conversation?.IsAdminConversation}");
+        Console.WriteLine($"SenderId: {senderId}");
+        Console.WriteLine("================================");
+        if (conversation == null)
+            throw new Exception("Conversation not found.");
+
+        if (conversation.IsReadOnly)
+        {
+            var sender = await _userManager.FindByIdAsync(senderId.ToString());
+
+            if (sender == null)
+                throw new Exception("User not found.");
+
+            var isAdmin = await _userManager.IsInRoleAsync(sender, "Admin");
+            Console.WriteLine($"Sender Role: {(isAdmin ? "Admin" : "User")}");
+            if (!isAdmin)
+                throw new UnauthorizedAccessException(
+                    "You cannot reply to this conversation.");
+        }
         var message = new Message
         {
             Id = Guid.NewGuid(),

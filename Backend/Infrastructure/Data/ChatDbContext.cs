@@ -44,7 +44,7 @@ public class ChatDbContext
                 .HasForeignKey(cp => cp.ConversationId);
 
             entity.HasOne(cp => cp.User)
-                .WithMany()
+                .WithMany(u => u.ConversationParticipants)
                 .HasForeignKey(cp => cp.UserId);
         });
     }

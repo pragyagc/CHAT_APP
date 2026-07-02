@@ -7,7 +7,9 @@ public class Conversation
     public string Name { get; set; } = string.Empty;
 
     public DateTime CreatedAt { get; set; }
+    public bool IsReadOnly { get; set; } = false;
 
+    public bool IsAdminConversation { get; set; } = false;
     public ICollection<Message> Messages { get; set; }
         = new List<Message>();
 

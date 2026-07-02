@@ -19,122 +19,127 @@ public class ChatHub : Hub
         _conversationService = conversationService;
     }
 
+    // -----------------------------------
+    // CONNECT
+    // -----------------------------------
     public override async Task OnConnectedAsync()
     {
-        var id = Context.User?
-        .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userIdValue = Context.User?
+            .FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        if (id != null)
+        if (userIdValue is not null)
         {
-            var userId = Guid.Parse(id);
+            var userId = Guid.Parse(userIdValue);
 
             OnlineUsers.Add(userId, Context.ConnectionId);
 
-            await Clients.All.SendAsync(
-                "UserOnline",
-                userId);
+            await Clients.All.SendAsync("UserOnline", userId);
         }
-        Console.WriteLine($"SignalR Connected : {Context.ConnectionId}");
 
+        Console.WriteLine($"Connected: {Context.ConnectionId}");
 
         await base.OnConnectedAsync();
     }
 
+    // -----------------------------------
+    // DISCONNECT
+    // -----------------------------------
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        Console.WriteLine($"SignalR Disconnected : {Context.ConnectionId}");
-        var id = Context.User?
-       .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userIdValue = Context.User?
+            .FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        if (id != null)
+        if (userIdValue is not null)
         {
-            var userId = Guid.Parse(id);
+            var userId = Guid.Parse(userIdValue);
 
             OnlineUsers.Remove(Context.ConnectionId);
 
-            await Clients.All.SendAsync(
-                "UserOffline",
-                userId);
+            await Clients.All.SendAsync("UserOffline", userId);
         }
-        
-        await base.OnDisconnectedAsync(exception);
+
+        Console.WriteLine($"Disconnected: {Context.ConnectionId}");
 
         await base.OnDisconnectedAsync(exception);
     }
 
+    // -----------------------------------
+    // JOIN CHAT ROOM
+    // -----------------------------------
     public async Task JoinConversation(Guid conversationId)
     {
-        var userIdValue =
-            Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userIdValue = Context.User?
+            .FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        if (userIdValue == null)
+        if (userIdValue is null)
             throw new HubException("Unauthorized");
 
         var userId = Guid.Parse(userIdValue);
 
-        var allowed = await _conversationService.IsParticipantAsync(
-            conversationId,
-            userId);
+        var allowed = await _conversationService.IsParticipantAsync(conversationId, userId);
 
         if (!allowed)
-            throw new HubException(
-                "You are not a participant of this conversation.");
+            throw new HubException("Not part of this conversation");
 
-        await Groups.AddToGroupAsync(
-            Context.ConnectionId,
-            conversationId.ToString());
-
-        Console.WriteLine(
-            $"User {userId} joined conversation {conversationId}");
+        await Groups.AddToGroupAsync(Context.ConnectionId, conversationId.ToString());
+        Console.WriteLine($"Joined group: {conversationId} with connection {Context.ConnectionId}");
+        Console.WriteLine($"User {userId} joined {conversationId}");
     }
 
+    // -----------------------------------
+    // LEAVE CHAT ROOM
+    // -----------------------------------
     public async Task LeaveConversation(Guid conversationId)
     {
-        await Groups.RemoveFromGroupAsync(
-            Context.ConnectionId,
-            conversationId.ToString());
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, conversationId.ToString());
 
-        Console.WriteLine(
-            $"User left conversation {conversationId}");
+        Console.WriteLine($"Left conversation {conversationId}");
     }
 
-    public async Task SendMessage(
-        Guid conversationId,
-        string content)
+    // -----------------------------------
+    // SEND MESSAGE (REALTIME CORE FIX)
+    // -----------------------------------
+    public async Task SendMessage(Guid conversationId, string content)
     {
-        var userIdValue =
-            Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userIdValue = Context.User?
+            .FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        if (userIdValue == null)
+        if (userIdValue is null)
             throw new HubException("Unauthorized");
 
         var senderId = Guid.Parse(userIdValue);
 
-        var allowed =
-            await _conversationService.IsParticipantAsync(
-                conversationId,
-                senderId);
+        var allowed = await _conversationService.IsParticipantAsync(conversationId, senderId);
 
         if (!allowed)
-            throw new HubException(
-                "You are not part of this conversation.");
+            throw new HubException("Not allowed");
 
-        var message =
-            await _messageService.SendAsync(
-                senderId,
-                conversationId,
-                content);
+        var messageDto = await _messageService.SendAsync(
+    senderId,
+    conversationId,
+    content);
 
-        await Clients
-            .Group(conversationId.ToString())
-            .SendAsync("ReceiveMessage", message);
+        Console.WriteLine("========== SEND MESSAGE ==========");
+        Console.WriteLine($"Conversation: {conversationId}");
+        Console.WriteLine($"ConnectionId: {Context.ConnectionId}");
+        Console.WriteLine($"Sender: {senderId}");
+
+        await Clients.Group(conversationId.ToString())
+            .SendAsync("ReceiveMessage", messageDto);
+
+        Console.WriteLine("ReceiveMessage broadcast completed");
+        Console.WriteLine("==================================");
     }
 
+    // -----------------------------------
+    // MARK AS SEEN
+    // -----------------------------------
     public async Task MarkAsSeen(Guid conversationId)
     {
-        var userIdValue = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userIdValue = Context.User?
+            .FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        if (userIdValue == null)
+        if (userIdValue is null)
             throw new HubException("Unauthorized");
 
         var userId = Guid.Parse(userIdValue);
@@ -146,14 +151,20 @@ public class ChatHub : Hub
 
         await _messageService.MarkConversationAsSeen(conversationId, userId);
 
-        // Get updated messages from DB
-        var messages = await _messageService.GetConversationMessagesAsync(conversationId);
+        var messageDtos =
+    await _messageService.GetConversationMessagesAsync(conversationId);
 
         await Clients.Group(conversationId.ToString())
-            .SendAsync("ConversationUpdated", messages);
+            .SendAsync("ConversationUpdated", messageDtos);
     }
+
+    // -----------------------------------
+    // ONLINE CHECK
+    // -----------------------------------
     public bool IsUserOnline(Guid userId)
     {
         return OnlineUsers.IsOnline(userId);
     }
+
+    
 }

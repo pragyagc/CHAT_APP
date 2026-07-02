@@ -1,7 +1,7 @@
 import { useState } from "react";
-import ConversationList from "./ConversationList";
-import UserList from "./UserList";
-import ChatWindow from "./ChatWindow";
+import ConversationList from "../assets/ConversationList";
+import UserList from "../components/UserList";
+import ChatWindow from "../components/ChatWindow";
 import { jwtDecode } from "jwt-decode";
 
 export default function ChatPage() {

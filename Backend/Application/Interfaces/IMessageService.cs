@@ -1,15 +1,22 @@
-﻿using Domain.Entities;
+﻿using Application.DTOs.Message;
 
 namespace Application.Interfaces;
 
 public interface IMessageService
 {
-    Task<Message> SendAsync(Guid senderId, Guid conversationId, string text);
+    Task<MessageDto> SendAsync(
+        Guid senderId,
+        Guid conversationId,
+        string text);
 
-    Task<List<Message>> GetConversationMessagesAsync(Guid conversationId);
+    Task<List<MessageDto>> GetConversationMessagesAsync(
+        Guid conversationId);
 
-    Task<Message?> GetByIdAsync(Guid id);
+    Task<MessageDto?> GetByIdAsync(Guid id);
 
     Task MarkAsSeenAsync(Guid messageId);
-    Task MarkConversationAsSeen(Guid conversationId, Guid userId);
+
+    Task MarkConversationAsSeen(
+        Guid conversationId,
+        Guid userId);
 }

@@ -6,3 +6,14 @@ export const connection = new signalR.HubConnectionBuilder()
   })
   .withAutomaticReconnect()
   .build();
+
+// // ✅ Add this below the connection
+// export async function ensureConnection() {
+//   if (connection.state === signalR.HubConnectionState.Connected) {
+//     return;
+//   }
+
+//   if (connection.state === signalR.HubConnectionState.Disconnected) {
+//     await connection.start();
+//   }
+// }

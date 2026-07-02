@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ApiwebService } from "../services";
 import "../styles/dashboard.css";
 
-import ConversationList from "../components/ConversationList";
+import ConversationList from "../assets/ConversationList";
 import UserList from "../components/UserList";
 import ChatWindow from "../components/ChatWindow";
 

@@ -1,15 +1,20 @@
 ﻿using Application.DTOs.User;
 using Application.Interfaces;
+using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Services;
 
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly UserManager<User> _userManager;
 
-    public UserService(IUserRepository userRepository)
+
+    public UserService(IUserRepository userRepository, UserManager<User> userManager)
     {
         _userRepository = userRepository;
+        _userManager = userManager;
     }
 
     // Get all users
@@ -32,12 +37,14 @@ public class UserService : IUserService
 
         if (user == null)
             return null;
-
+        var role = (await _userManager.GetRolesAsync(user))
+       .FirstOrDefault() ?? "";
         return new UserDto
         {
             Id = user.Id,
             UserName = user.UserName!,
-            Email = user.Email!
+            Email = user.Email!,
+            Role=role
         };
     }
 
@@ -48,12 +55,15 @@ public class UserService : IUserService
 
         if (user == null)
             return null;
+        var role = (await _userManager.GetRolesAsync(user))
+        .FirstOrDefault() ?? "";
 
         return new UserProfileDto
         {
             Id = user.Id,
             UserName = user.UserName!,
-            Email = user.Email!
+            Email = user.Email!,
+            Role = role
         };
     }
 

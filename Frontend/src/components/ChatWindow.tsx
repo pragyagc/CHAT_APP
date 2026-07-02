@@ -7,6 +7,7 @@ export default function ChatWindow({ conversation }: any) {
   const [text, setText] = useState("");
   const [currentUserId, setCurrentUserId] = useState("");
   const [hasNewMessages, setHasNewMessages] = useState(false);
+  const canSend = !conversation?.isAdminConversation;
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [isOnline, setIsOnline] = useState(false);
@@ -114,6 +115,7 @@ connection.on("ConversationUpdated", (updatedMessages: any[]) => {
 
   // ---------------- SEND MESSAGE ----------------
   async function sendMessage() {
+     if (!canSend) return;
     if (!text.trim()) return;
 
     await connection.invoke("SendMessage", conversation.id, text);
@@ -146,6 +148,10 @@ connection.on("ConversationUpdated", (updatedMessages: any[]) => {
 
   // ---------------- INIT ----------------
   useEffect(() => {
+
+    if (conversation) {
+    console.log("Conversation:", conversation);
+  }
     if (!conversation?.id) return;
 
     setMessages([]);
@@ -328,27 +334,45 @@ connection.on("ConversationUpdated", (updatedMessages: any[]) => {
       )}
 
       {/* INPUT */}
-      <div
-        style={{
-          display: "flex",
-          padding: "10px",
-          borderTop: "1px solid #ddd",
-        }}
-      >
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          style={{
-            flex: 1,
-            padding: "10px",
-            borderRadius: "20px",
-          }}
-        />
+      {canSend ? (
+  <div
+    style={{
+      display: "flex",
+      padding: "10px",
+      borderTop: "1px solid #ddd",
+    }}
+  >
+    <input
+      value={text}
+      onChange={(e) => setText(e.target.value)}
+      style={{
+        flex: 1,
+        padding: "10px",
+        borderRadius: "20px",
+      }}
+      placeholder="Type a message..."
+    />
 
-        <button onClick={sendMessage} style={{ marginLeft: 10 }}>
-          Send
-        </button>
-      </div>
+    <button
+      onClick={sendMessage}
+      style={{ marginLeft: 10 }}
+    >
+      Send
+    </button>
+  </div>
+) : (
+  <div
+    style={{
+      padding: "16px",
+      textAlign: "center",
+      color: "#666",
+      borderTop: "1px solid #ddd",
+      background: "#fafafa",
+    }}
+  >
+    This is an admin conversation. You cannot reply.
+  </div>
+)}
     </div>
   );
 }

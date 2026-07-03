@@ -67,22 +67,20 @@ export default function ConversationList({
 
             <br />
 
-            <small>
+            {/* <small>
               {conversation.otherUserEmail}
-            </small>
+            </small> */}
 
-            <br />
-
-            <div
+            {/* <div
               style={{
                 color: "gray",
                 marginTop: "5px",
               }}
             >
               {conversation.lastMessage || "No messages yet"}
-            </div>
+            </div> */}
 
-            {conversation.lastMessageTime && (
+            {/* {conversation.lastMessageTime && (
               <small
                 style={{
                   color: "#999",
@@ -92,7 +90,7 @@ export default function ConversationList({
                   conversation.lastMessageTime
                 ).toLocaleString()}
               </small>
-            )}
+            )} */}
           </div>
         ))
       )}

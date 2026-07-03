@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ApiwebService } from "../../services";
-import { connection } from "../../signalr/connection";
+import {ensureConnection, connection } from "../../signalr/connection";
 
 type Props = {
     conversation: any;
@@ -37,26 +37,30 @@ export default function AdminChatWindow({
         setMessages(result);
     }
 
-    async function joinConversation() {
- 
+       async function joinConversation() {
 
+    await ensureConnection();
 
+    await connection.invoke(
+        "JoinConversation",
+        conversation.id
+    );
 
-  await connection.invoke("JoinConversation", conversation.id);
+    connection.off("ReceiveMessage");
 
-  connection.off("ReceiveMessage");
+    connection.on("ReceiveMessage", (msg: any) => {
+        if (msg.conversationId !== conversation.id) return;
 
-  connection.on("ReceiveMessage", (msg: any) => {
-    if (msg.conversationId !== conversation.id) return;
-
-    setMessages(prev => [...prev, msg]);
-  });
-}
+        setMessages(prev => [...prev, msg]);
+    });
+} 
 
     async function send() {
 
         if (!text.trim())
             return;
+        await ensureConnection();
+
 
         await connection.invoke
         (

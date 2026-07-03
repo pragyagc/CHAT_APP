@@ -1,13 +1,13 @@
-import * as signalR from "@microsoft/signalr";
+// import * as signalR from "@microsoft/signalr";
 
-export const connection = new signalR.HubConnectionBuilder()
-  .withUrl("http://localhost:5162/chatHub", {
-    accessTokenFactory: () => localStorage.getItem("token") || "",
-  })
-  .withAutomaticReconnect()
-  .build();
+// export const connection = new signalR.HubConnectionBuilder()
+//   .withUrl("http://localhost:5162/chatHub", {
+//     accessTokenFactory: () => localStorage.getItem("token") || "",
+//   })
+//   .withAutomaticReconnect()
+//   .build();
 
-// // ✅ Add this below the connection
+// // Add this below the connection
 // export async function ensureConnection() {
 //   if (connection.state === signalR.HubConnectionState.Connected) {
 //     return;
@@ -17,3 +17,23 @@ export const connection = new signalR.HubConnectionBuilder()
 //     await connection.start();
 //   }
 // }
+
+import * as signalR from "@microsoft/signalr";
+
+export const connection = new signalR.HubConnectionBuilder()
+  .withUrl("http://localhost:5162/chatHub", {
+    accessTokenFactory: () =>
+      localStorage.getItem("adminToken") ||
+      localStorage.getItem("token") ||
+      "",
+  })
+  .withAutomaticReconnect()
+  .build();
+
+export async function ensureConnection() {
+  if (connection.state === signalR.HubConnectionState.Connected)
+    return;
+
+  if (connection.state === signalR.HubConnectionState.Disconnected)
+    await connection.start();
+}

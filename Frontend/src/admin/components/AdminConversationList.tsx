@@ -30,24 +30,31 @@ export default function AdminConversationList({
     }
 
     async function openChat(user: any) {
-
         try {
 
-            // Creates conversation if it doesn't exist
-            const conversation =
-                await ApiwebService.postConversations(user.id);
+        // Create (or get) the conversation
+        const createdConversation =
+            await ApiwebService.postConversations(user.id);
 
-            onSelectConversation(conversation);
+        // Load the complete conversation list
+        const conversations =
+            await ApiwebService.getConversations();
 
-        } catch (err) {
+        // Find the conversation we just created/opened
+        const fullConversation = conversations.find(
+            (c: any) => c.id === createdConversation.id
+        );
 
-            console.error(err);
+        console.log(fullConversation);
 
-            alert("Unable to open chat.");
-
+        if (fullConversation) {
+            onSelectConversation(fullConversation);
         }
 
-    }
+    } catch (err) {
+        console.error(err);
+        alert("Unable to open chat.");
+    }}
 
     return (
 

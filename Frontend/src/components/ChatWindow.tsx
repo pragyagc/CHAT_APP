@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ApiwebService } from "../services";
-import { connection } from "../signalr/connection";
+import { connection,ensureConnection } from "../signalr/connection";
 
 export default function ChatWindow({ conversation }: any) {
   const [messages, setMessages] = useState<any[]>([]);
@@ -18,6 +18,7 @@ export default function ChatWindow({ conversation }: any) {
   async function loadCurrentUser() {
     const me = await ApiwebService.getUsersMe();
     setCurrentUserId(me.id);
+    console.log("Logged in user:", me);
   }
 
   // ---------------- SCROLL ----------------
@@ -148,7 +149,7 @@ connection.on("ConversationUpdated", (updatedMessages: any[]) => {
 
   // ---------------- INIT ----------------
   useEffect(() => {
-
+      ensureConnection().catch(console.error);
     if (conversation) {
     console.log("Conversation:", conversation);
   }
@@ -252,6 +253,8 @@ connection.on("ConversationUpdated", (updatedMessages: any[]) => {
       >
         {messages.map((m) => {
           const isMine = m.senderId === currentUserId;
+          console.log("Current User:", currentUserId);
+console.log("Message Sender:", m.senderId);
 
           return (
             <div

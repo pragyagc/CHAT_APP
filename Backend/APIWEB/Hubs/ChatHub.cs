@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
 using Application.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 
 namespace APIWEB.Hubs;
@@ -10,18 +12,29 @@ public class ChatHub : Hub
 {
     private readonly IMessageService _messageService;
     private readonly IConversationService _conversationService;
+    private readonly UserManager<User> _userManager;
 
     public ChatHub(
         IMessageService messageService,
-        IConversationService conversationService)
+        IConversationService conversationService,
+    UserManager<User> userManager)
     {
         _messageService = messageService;
         _conversationService = conversationService;
+        _userManager= userManager;
     }
 
-    // -----------------------------------
-    // CONNECT
-    // -----------------------------------
+    private async Task<bool> IsAdminAsync()
+    {
+        var user = await _userManager.GetUserAsync(Context.User);
+
+        if (user == null)
+            return false;
+
+        return await _userManager.IsInRoleAsync(user, "Admin");
+    }
+
+ 
     public override async Task OnConnectedAsync()
     {
         var userIdValue = Context.User?
@@ -41,9 +54,7 @@ public class ChatHub : Hub
         await base.OnConnectedAsync();
     }
 
-    // -----------------------------------
-    // DISCONNECT
-    // -----------------------------------
+   
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var userIdValue = Context.User?
@@ -63,9 +74,6 @@ public class ChatHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    // -----------------------------------
-    // JOIN CHAT ROOM
-    // -----------------------------------
     public async Task JoinConversation(Guid conversationId)
     {
         var userIdValue = Context.User?
@@ -76,19 +84,22 @@ public class ChatHub : Hub
 
         var userId = Guid.Parse(userIdValue);
 
-        var allowed = await _conversationService.IsParticipantAsync(conversationId, userId);
+        var allowed =
+        await _conversationService.IsParticipantAsync(conversationId, userId);
 
         if (!allowed)
-            throw new HubException("Not part of this conversation");
+        {
+            var isAdmin = await IsAdminAsync();
 
+            if (!isAdmin)
+                throw new HubException("Not part of this conversation");
+        }
         await Groups.AddToGroupAsync(Context.ConnectionId, conversationId.ToString());
         Console.WriteLine($"Joined group: {conversationId} with connection {Context.ConnectionId}");
         Console.WriteLine($"User {userId} joined {conversationId}");
     }
 
-    // -----------------------------------
-    // LEAVE CHAT ROOM
-    // -----------------------------------
+ 
     public async Task LeaveConversation(Guid conversationId)
     {
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, conversationId.ToString());
@@ -96,9 +107,7 @@ public class ChatHub : Hub
         Console.WriteLine($"Left conversation {conversationId}");
     }
 
-    // -----------------------------------
-    // SEND MESSAGE (REALTIME CORE FIX)
-    // -----------------------------------
+ 
     public async Task SendMessage(Guid conversationId, string content)
     {
         var userIdValue = Context.User?
@@ -108,11 +117,27 @@ public class ChatHub : Hub
             throw new HubException("Unauthorized");
 
         var senderId = Guid.Parse(userIdValue);
+        var user = await _userManager.GetUserAsync(Context.User);
 
-        var allowed = await _conversationService.IsParticipantAsync(conversationId, senderId);
+        Console.WriteLine($"Current User: {user?.UserName}");
+        Console.WriteLine($"Current Email: {user?.Email}");
 
-        if (!allowed)
+
+
+
+        var allowed =
+     await _conversationService.IsParticipantAsync(conversationId, senderId);
+
+        Console.WriteLine($"Participant: {allowed}");
+
+        var isAdmin = await IsAdminAsync();
+
+        Console.WriteLine($"IsAdmin: {isAdmin}");
+
+        if (!allowed && !isAdmin)
+        {
             throw new HubException("Not allowed");
+        }
 
         var messageDto = await _messageService.SendAsync(
     senderId,
@@ -131,9 +156,7 @@ public class ChatHub : Hub
         Console.WriteLine("==================================");
     }
 
-    // -----------------------------------
-    // MARK AS SEEN
-    // -----------------------------------
+   
     public async Task MarkAsSeen(Guid conversationId)
     {
         var userIdValue = Context.User?
@@ -147,7 +170,12 @@ public class ChatHub : Hub
         var allowed = await _conversationService.IsParticipantAsync(conversationId, userId);
 
         if (!allowed)
-            throw new HubException("Not allowed");
+        {
+            var isAdmin = await IsAdminAsync();
+
+            if (!isAdmin)
+                throw new HubException("Not allowed");
+        }
 
         await _messageService.MarkConversationAsSeen(conversationId, userId);
 
@@ -158,9 +186,6 @@ public class ChatHub : Hub
             .SendAsync("ConversationUpdated", messageDtos);
     }
 
-    // -----------------------------------
-    // ONLINE CHECK
-    // -----------------------------------
     public bool IsUserOnline(Guid userId)
     {
         return OnlineUsers.IsOnline(userId);

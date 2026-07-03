@@ -27,37 +27,70 @@ useEffect(() => {
   }
 }, [currentUserId]);
 
-  async function loadUsers() {
-    try {
-      const result = await ApiwebService.getUsers();
+ async function loadUsers() {
+  try {
+    setLoading(true);
 
-      const filtered = result.filter(
-        (u: User) => u.id !== currentUserId
-      );
+    // Get all users
+    const allUsers = await ApiwebService.getUsers();
 
-      setUsers(filtered);
-    } catch (err) {
-      console.error("Failed to load users", err);
-    } finally {
-      setLoading(false);
-    }
+    // Get all existing conversations
+    const conversations =
+      await ApiwebService.getConversations();
+
+    // IDs of users already in conversations
+    const conversationUserIds = conversations.map(
+      (c: any) => c.otherUserId
+    );
+
+    // Show only users who:
+    // - aren't me
+    // - aren't already in my conversation list
+    const filtered = allUsers.filter(
+      (u: User) =>
+        u.id !== currentUserId &&
+        !conversationUserIds.includes(u.id)
+    );
+
+    setUsers(filtered);
+
+  } catch (err) {
+    console.error("Failed to load users", err);
+  } finally {
+    setLoading(false);
   }
+}
+ async function createConversation(userId: string) {
+  try {
+    // Create the conversation
+    const createdConversation =
+      await ApiwebService.postConversations(userId);
 
-  async function createConversation(userId: string) {
-    try {
-      const conversation =
-        await ApiwebService.postConversations(userId);
+    console.log("Conversation created:", createdConversation);
 
-      console.log("Conversation created:", conversation);
+    // Load the full conversation list
+    const conversations =
+      await ApiwebService.getConversations();
 
-      onConversationCreated();
+    // Find the newly created conversation
+    const fullConversation = conversations.find(
+      (c: any) => c.id === createdConversation.id
+    );
 
-      onSelectConversation(conversation);
+    console.log("Full conversation:", fullConversation);
 
-    } catch (err) {
-      console.error("Failed to create conversation", err);
+    // Refresh the conversation list
+    onConversationCreated();
+
+    // Open the chat with the full conversation object
+    if (fullConversation) {
+      onSelectConversation(fullConversation);
     }
+
+  } catch (err) {
+    console.error("Failed to create conversation", err);
   }
+}
 
   if (loading) {
     return <p>Loading users...</p>;
@@ -65,27 +98,53 @@ useEffect(() => {
 
   return (
     <div>
-      <h3>Start New Chat</h3>
+  {users.length > 0 && (
+    <>
+      <div
+        style={{
+          padding: "12px 16px",
+          fontWeight: 600,
+          fontSize: "15px",
+          borderBottom: "1px solid #e5e5e5",
+          background: "#fafafa",
+        }}
+      >
+        Start New Chat
+      </div>
 
       {users.map((user) => (
         <div
           key={user.id}
           onClick={() => createConversation(user.id)}
           style={{
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            padding: "10px",
-            marginBottom: "10px",
+            borderBottom: "1px solid #eee",
+            padding: "12px 16px",
             cursor: "pointer",
+            transition: "background 0.2s",
           }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.background = "#f5f5f5")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.background = "white")
+          }
         >
-          <strong>{user.userName}</strong>
+          <div style={{ fontWeight: 600 }}>
+            {user.userName}
+          </div>
 
-          <br />
-
-          <small>{user.email}</small>
+          <div
+            style={{
+              fontSize: "13px",
+              color: "#666",
+            }}
+          >
+            {user.email}
+          </div>
         </div>
       ))}
-    </div>
+    </>
+  )}
+</div>
   );
 }

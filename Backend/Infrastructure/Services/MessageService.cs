@@ -115,9 +115,13 @@ public class MessageService : IMessageService
         var messages =
             await _repository.GetByConversationIdAsync(conversationId);
 
-        foreach (var msg in messages.Where(m =>
-                     m.SenderId != userId &&
-                     !m.IsSeen))
+        var unseenMessages = messages.Where(m => m.SenderId != userId && !m.IsSeen)
+            .ToList();
+
+        if (!unseenMessages.Any())
+            return;
+
+        foreach (var msg in unseenMessages)
         {
             msg.IsSeen = true;
             msg.SeenAt = DateTime.UtcNow;
@@ -125,6 +129,7 @@ public class MessageService : IMessageService
 
         await _repository.SaveAsync();
     }
+       
 
     private static MessageDto ToDto(Message message)
     {

@@ -3,13 +3,13 @@ import { ApiwebService } from "../services";
 
 type Props = {
   refresh: boolean;
-  unreadConversations?: Set<string>;
+  unreadConversations?: Map<string, number>;
   onSelectConversation: (conversation: any) => void;
 };
 
 export default function ConversationList({
   refresh,
-  unreadConversations = new Set(),
+  unreadConversations = new Map(),
   onSelectConversation,
 }: Props) {
   const [conversations, setConversations] = useState<any[]>([]);
@@ -22,8 +22,6 @@ export default function ConversationList({
 
       const data =
         await ApiwebService.getConversations();
-
-      console.log("Conversations:", data);
 
       setConversations(data ?? []);
     } catch (err) {
@@ -66,25 +64,34 @@ export default function ConversationList({
             }}
           >
             <div
-  style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  }}
->
-  <strong>{conversation.otherUserName}</strong>
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <strong>{conversation.otherUserName}</strong>
 
-  {unreadConversations.has(conversation.id) && (
-    <div
-      style={{
-        width: 10,
-        height: 10,
-        borderRadius: "50%",
-        backgroundColor: "#0084ff",
-      }}
-    />
-  )}
-</div>
+              {unreadConversations.has(conversation.id) && (
+                <div
+                  style={{
+                    minWidth: 20,
+                    height: 20,
+                    borderRadius: 10,
+                    backgroundColor: "#0084ff",
+                    color: "#fff",
+                    fontSize: 11,
+                    fontWeight: "bold",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0 5px",
+                  }}
+                >
+                  {unreadConversations.get(conversation.id)}
+                </div>
+              )}
+            </div>
 
             <br />
 

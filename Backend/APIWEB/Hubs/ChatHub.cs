@@ -35,24 +35,6 @@ public class ChatHub : Hub
     }
 
 
-    //public override async Task OnConnectedAsync()
-    //{
-    //    var userIdValue = Context.User?
-    //        .FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-    //    if (userIdValue is not null)
-    //    {
-    //        var userId = Guid.Parse(userIdValue);
-
-    //        OnlineUsers.Add(userId, Context.ConnectionId);
-
-    //        await Clients.All.SendAsync("UserOnline", userId);
-    //    }
-
-    //    Console.WriteLine($"Connected: {Context.ConnectionId}");
-
-    //    await base.OnConnectedAsync();
-    //}
 
     public override async Task OnConnectedAsync()
     {
@@ -64,14 +46,12 @@ public class ChatHub : Hub
             return;
         }
 
-        // Prevent deleted users from connecting
         if (user.IsDeleted)
         {
             Context.Abort();
             return;
         }
 
-        // Prevent blocked users from connecting
         if (user.IsBlocked)
         {
             Context.Abort();
@@ -80,31 +60,27 @@ public class ChatHub : Hub
 
         OnlineUsers.Add(user.Id, Context.ConnectionId);
 
+        // Join ALL conversation groups
+        var conversationIds =
+            await _conversationService
+                .GetConversationIdsForUserAsync(user.Id);
+
+        foreach (var conversationId in conversationIds)
+        {
+            await Groups.AddToGroupAsync(
+                Context.ConnectionId,
+                conversationId.ToString());
+        }
+
         await Clients.All.SendAsync("UserOnline", user.Id);
 
         Console.WriteLine($"Connected: {Context.ConnectionId}");
+        Console.WriteLine($"Joined {conversationIds.Count} conversation groups");
 
         await base.OnConnectedAsync();
     }
 
-    //public override async Task OnDisconnectedAsync(Exception? exception)
-    //{
-    //    var userIdValue = Context.User?
-    //        .FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-    //    if (userIdValue is not null)
-    //    {
-    //        var userId = Guid.Parse(userIdValue);
-
-    //        OnlineUsers.Remove(Context.ConnectionId);
-
-    //        await Clients.All.SendAsync("UserOffline", userId);
-    //    }
-
-    //    Console.WriteLine($"Disconnected: {Context.ConnectionId}");
-
-    //    await base.OnDisconnectedAsync(exception);
-    //}
+    //disconnected
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
@@ -132,29 +108,26 @@ public class ChatHub : Hub
         var userId = Guid.Parse(userIdValue);
 
         var allowed =
-        await _conversationService.IsParticipantAsync(conversationId, userId);
+            await _conversationService.IsParticipantAsync(conversationId, userId);
 
         if (!allowed)
         {
             var isAdmin = await IsAdminAsync();
-
             if (!isAdmin)
                 throw new HubException("Not part of this conversation");
         }
+
         await Groups.AddToGroupAsync(Context.ConnectionId, conversationId.ToString());
-        Console.WriteLine($"Joined group: {conversationId} with connection {Context.ConnectionId}");
-        Console.WriteLine($"User {userId} joined {conversationId}");
+        Console.WriteLine($"User {userId} joined group {conversationId}");
     }
 
- 
     public async Task LeaveConversation(Guid conversationId)
     {
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, conversationId.ToString());
-
         Console.WriteLine($"Left conversation {conversationId}");
     }
 
- 
+
     public async Task SendMessage(Guid conversationId, string content)
     {
         var userIdValue = Context.User?
@@ -198,9 +171,8 @@ public class ChatHub : Hub
 
         await Clients.Group(conversationId.ToString())
             .SendAsync("ReceiveMessage", messageDto);
-
-        Console.WriteLine("ReceiveMessage broadcast completed");
-        Console.WriteLine("==================================");
+        await Clients.Group(conversationId.ToString())
+    .SendAsync("ConversationChanged", conversationId);
     }
 
    
@@ -226,11 +198,8 @@ public class ChatHub : Hub
 
         await _messageService.MarkConversationAsSeen(conversationId, userId);
 
-        var messageDtos =
-    await _messageService.GetConversationMessagesAsync(conversationId);
-
-        await Clients.Group(conversationId.ToString())
-            .SendAsync("ConversationUpdated", messageDtos);
+        await Clients.OthersInGroup(conversationId.ToString())
+            .SendAsync("MessagesSeen", conversationId);
     }
 
     public bool IsUserOnline(Guid userId)
@@ -238,5 +207,12 @@ public class ChatHub : Hub
         return OnlineUsers.IsOnline(userId);
     }
 
-    
+    public async Task NotifyConversationOpened(Guid conversationId)
+    {
+        await Groups.AddToGroupAsync(
+            Context.ConnectionId,
+            conversationId.ToString());
+    }
+
+
 }

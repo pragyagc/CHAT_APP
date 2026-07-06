@@ -12,4 +12,6 @@ public interface IConversationService
 
     Task<bool> IsParticipantAsync(Guid conversationId, Guid userId);
     Task<List<Guid>> GetParticipantIdsAsync(Guid conversationId);
+
+    Task<List<Guid>> GetConversationIdsForUserAsync(Guid userId);
 }

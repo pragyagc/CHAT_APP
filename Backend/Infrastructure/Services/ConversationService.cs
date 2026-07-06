@@ -147,7 +147,8 @@ public class ConversationService : IConversationService
 
                 IsReadOnly = conversation.IsReadOnly,
 
-                IsAdminConversation = conversation.IsAdminConversation
+                IsAdminConversation = conversation.IsAdminConversation,
+                UnreadCount = conversation.Messages.Count(m =>m.SenderId != currentUserId &&!m.IsSeen)
             });
         }
 
@@ -174,5 +175,10 @@ public class ConversationService : IConversationService
     {
         return await _repository
             .GetParticipantIdsAsync(conversationId);
+    }
+
+    public async Task<List<Guid>> GetConversationIdsForUserAsync(Guid userId)
+    {
+        return await _repository.GetConversationIdsForUserAsync(userId);
     }
 }

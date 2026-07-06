@@ -17,4 +17,5 @@ public class ConversationDto
     public bool IsReadOnly { get; set; }
 
     public bool IsAdminConversation { get; set; }
+    public int UnreadCount { get; set; }
 }

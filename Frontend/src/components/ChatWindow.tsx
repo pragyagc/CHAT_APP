@@ -4,16 +4,17 @@ import { connection,ensureConnection } from "../signalr/connection";
 
 type Props = {
   conversation: any;
+  currentUserId: string;
   onUnreadMessage?: (conversationId: string) => void;
 };
 
-export default function ChatWindow({
+ export default function ChatWindow({
   conversation,
+  currentUserId,
   onUnreadMessage,
-}: Props) {
+}: Props){
   const [messages, setMessages] = useState<any[]>([]);
   const [text, setText] = useState("");
-  const [currentUserId, setCurrentUserId] = useState("");
   const [hasNewMessages, setHasNewMessages] = useState(false);
   const canSend = !conversation?.isAdminConversation;
 
@@ -21,13 +22,11 @@ export default function ChatWindow({
   const [isOnline, setIsOnline] = useState(false);
   const isAtBottomRef = useRef(true);
   const isTabActiveRef = useRef(true);
+  const currentUserIdRef = useRef(currentUserId);
+  useEffect(() => { currentUserIdRef.current = currentUserId; }, [currentUserId]);
 
-  // ---------------- USER ----------------
-  async function loadCurrentUser() {
-    const me = await ApiwebService.getUsersMe();
-    setCurrentUserId(me.id);
-    console.log("Logged in user:", me);
-  }
+
+ 
 
   // ---------------- SCROLL ----------------
   const checkIfAtBottom = () => {
@@ -48,7 +47,7 @@ export default function ChatWindow({
   const markAsSeen = () => {
     if (!isTabActiveRef.current) return;
     if (!conversation?.id) return;
-
+    if (conversation.otherUserId === currentUserIdRef.current) return;
     connection.invoke("MarkAsSeen", conversation.id).catch(() => {});
   };
 
@@ -62,84 +61,15 @@ export default function ChatWindow({
 
     setTimeout(() => {
       scrollToBottom(false);
-      markAsSeen(); // IMPORTANT: mark seen on open
+      const hasUnseenFromOther = (data ?? []).some(
+        (m: any) => m.senderId !== currentUserIdRef.current && !m.isSeen
+      );
+      if (checkIfAtBottom() && hasUnseenFromOther) markAsSeen();
     }, 50);
   }
 
-  // ---------------- JOIN CHAT ----------------
-  async function joinChat() {
-    if (connection.state === "Disconnected") {
-      await connection.start();
-    }
-
-    await connection.invoke("JoinConversation", conversation.id);
-    // Get current online status
-const online = await connection.invoke(
-  "IsUserOnline",
-  conversation.otherUserId
-);
-
-setIsOnline(online);
-
-// Listen for online/offline events
-connection.off("UserOnline");
-connection.off("UserOffline");
-
-connection.on("UserOnline", (userId: string) => {
-  if (userId === conversation.otherUserId) {
-    setIsOnline(true);
-  }
-});
-
-connection.on("UserOffline", (userId: string) => {
-  if (userId === conversation.otherUserId) {
-    setIsOnline(false);
-  }
-});
-    // connection.off("ReceiveMessage");
-
-    // connection.on("ReceiveMessage", (msg: any) => {
-    //   if (msg.conversationId !== conversation.id) return;
-
-    //   setMessages((prev) => [...prev, msg]);
-
-    //   if (isAtBottomRef.current) {
-    //     setTimeout(() => {
-    //       scrollToBottom();
-    //       markAsSeen();
-    //     }, 50);
-    //   } else {
-    //     setHasNewMessages(true);
-    //   }
-    // });
-  connection.on("ReceiveMessage", (msg: any) => {
-
-  // Message belongs to another conversation
-  if (msg.conversationId !== conversation.id) {
-    onUnreadMessage?.(msg.conversationId);
-    return;
-  }
-
-  // Current conversation
-  setMessages((prev) => [...prev, msg]);
-
-  if (isAtBottomRef.current) {
-    setTimeout(() => {
-      scrollToBottom();
-      markAsSeen();
-    }, 50);
-  } else {
-    setHasNewMessages(true);
-  }
-});
-  connection.off("ConversationUpdated");
-
-connection.on("ConversationUpdated", (updatedMessages: any[]) => {
-    setMessages(updatedMessages);
-});
 
 
-  }
 
   // ---------------- SEND MESSAGE ----------------
   async function sendMessage() {
@@ -150,52 +80,87 @@ connection.on("ConversationUpdated", (updatedMessages: any[]) => {
 
     setText("");
 
-    setTimeout(() => scrollToBottom(), 50);
+    isTabActiveRef.current=true;
   }
 
   // ---------------- TAB VISIBILITY FIX ----------------
-  useEffect(() => {
-    const handleVisibility = () => {
-      isTabActiveRef.current =
-        document.visibilityState === "visible";
+    useEffect(() => {
+  const handleVisibility = () => {
+    isTabActiveRef.current =
+      document.visibilityState === "visible";
+  };
 
-      if (isTabActiveRef.current) {
-        markAsSeen();
-      }
-    };
+  document.addEventListener("visibilitychange", handleVisibility);
 
-    document.addEventListener("visibilitychange", handleVisibility);
-
-    return () => {
-      document.removeEventListener(
-        "visibilitychange",
-        handleVisibility
-      );
-    };
-  }, []);
+  return () => {
+    document.removeEventListener(
+      "visibilitychange",
+      handleVisibility
+    );
+  };
+}, []);
 
   // ---------------- INIT ----------------
   useEffect(() => {
-      ensureConnection().catch(console.error);
-    if (conversation) {
-    console.log("Conversation:", conversation);
-  }
     if (!conversation?.id) return;
 
-    setMessages([]);
-    setHasNewMessages(false);
+    let mounted = true;
 
-    loadCurrentUser();
-    loadMessages();
-    joinChat();
+    const onReceiveMessage = (msg: any) => {
+      if (msg.conversationId !== conversation.id) return;
+      setMessages(prev => {
+        const exists = prev.some(x => x.id === msg.id);
+        if (exists) return prev;
+        return [...prev, msg];
+      });
+      const isMine = msg.senderId === currentUserIdRef.current;
+      if (isMine || (isAtBottomRef.current && isTabActiveRef.current)) {
+        requestAnimationFrame(() => {
+          scrollToBottom();
+          if (!isMine) markAsSeen();
+        });
+      } else {
+        setHasNewMessages(true);
+      }
+    };
+
+    const onMessagesSeen = (conversationId: string) => {
+      if (conversationId !== conversation.id) return;
+      setMessages(prev => prev.map(m => ({ ...m, isSeen: true })));
+    };
+
+    const onUserOnline = (userId: string) => {
+      if (userId === conversation.otherUserId) setIsOnline(true);
+    };
+
+    const onUserOffline = (userId: string) => {
+      if (userId === conversation.otherUserId) setIsOnline(false);
+    };
+
+    const init = async () => {
+      await ensureConnection();
+      if (!mounted) return;
+
+      setMessages([]);
+      setHasNewMessages(false);
+      loadMessages();
+
+      connection.invoke("JoinConversation", conversation.id).catch(() => {});
+    };
+
+    connection.on("ReceiveMessage", onReceiveMessage);
+    connection.on("MessagesSeen", onMessagesSeen);
+    connection.on("UserOnline", onUserOnline);
+    connection.on("UserOffline", onUserOffline);
+
+    init();
 
     return () => {
-      connection.invoke("LeaveConversation", conversation.id).catch(() => {});
-      connection.off("ReceiveMessage");
-      connection.off("MessagesSeen");
-       connection.off("ConversationUpdated");
-  connection.off("UserOnline");
-  connection.off("UserOffline");
+      mounted = false;
+      connection.off("ReceiveMessage", onReceiveMessage);
+      connection.off("MessagesSeen", onMessagesSeen);
+      connection.off("UserOnline", onUserOnline);
+      connection.off("UserOffline", onUserOffline);
     };
   }, [conversation?.id]);
 
@@ -265,10 +230,12 @@ connection.on("ConversationUpdated", (updatedMessages: any[]) => {
         ref={scrollRef}
         onScroll={() => {
           isAtBottomRef.current = checkIfAtBottom();
-
           if (isAtBottomRef.current) {
             setHasNewMessages(false);
-            markAsSeen();
+            const hasUnseenFromOther = messages.some(
+              (m) => m.senderId !== currentUserIdRef.current && !m.isSeen
+            );
+            if (hasUnseenFromOther) markAsSeen();
           }
         }}
         style={{
@@ -279,9 +246,7 @@ connection.on("ConversationUpdated", (updatedMessages: any[]) => {
         }}
       >
         {messages.map((m) => {
-          const isMine = m.senderId === currentUserId;
-          console.log("Current User:", currentUserId);
-console.log("Message Sender:", m.senderId);
+          const isMine = m.senderId === currentUserIdRef.current;
 
           return (
             <div
@@ -343,10 +308,12 @@ console.log("Message Sender:", m.senderId);
       {/* NEW MESSAGE BUTTON */}
       {hasNewMessages && (
         <div
-          onClick={() => {
-            scrollToBottom();
-            setHasNewMessages(false);
-          }}
+         
+        onClick={() => {
+    scrollToBottom();
+    setHasNewMessages(false);
+    markAsSeen();
+}}
           style={{
             position: "absolute",
             bottom: 90,

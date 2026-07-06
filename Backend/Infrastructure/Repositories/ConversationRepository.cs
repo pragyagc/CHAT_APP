@@ -70,4 +70,12 @@ public class ConversationRepository : IConversationRepository
             .Select(cp => cp.UserId)
             .ToListAsync();
     }
+
+    public async Task<List<Guid>> GetConversationIdsForUserAsync(Guid userId)
+    {
+        return await _db.ConversationParticipants
+            .Where(cp => cp.UserId == userId)
+            .Select(cp => cp.ConversationId)
+            .ToListAsync();
+    }
 }

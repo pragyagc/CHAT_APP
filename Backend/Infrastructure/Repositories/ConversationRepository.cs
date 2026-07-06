@@ -61,4 +61,13 @@ public class ConversationRepository : IConversationRepository
                 c.Participants.Any(p => p.UserId == user1Id) &&
                 c.Participants.Any(p => p.UserId == user2Id));
     }
+
+
+    public async Task<List<Guid>> GetParticipantIdsAsync(Guid conversationId)
+    {
+        return await _db.ConversationParticipants
+            .Where(cp => cp.ConversationId == conversationId)
+            .Select(cp => cp.UserId)
+            .ToListAsync();
+    }
 }

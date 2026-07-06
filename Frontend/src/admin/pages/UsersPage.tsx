@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { ApiwebService } from "../../services";
 import UserDetails from "./UserDetails";
+import CreateUserModal from "../components/CreateUserModal";
 
 export default function UsersPage() {
 
     const [users, setUsers] = useState<any[]>([]);
     const [selectedUser, setSelectedUser] = useState<any>();
-
+    const [showCreateModal, setShowCreateModal] = useState(false);
     useEffect(() => {
         loadUsers();
     }, []);
@@ -30,7 +31,22 @@ export default function UsersPage() {
     return (
         <div>
 
-            <h2>Users</h2>
+            <div
+    style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 20
+    }}
+>
+    <h2>Users</h2>
+
+    <button
+        onClick={() => setShowCreateModal(true)}
+    >
+        + Create User
+    </button>
+</div>
 
             <table
                 border={1}
@@ -81,6 +97,16 @@ export default function UsersPage() {
                 </tbody>
 
             </table>
+
+            {showCreateModal && (
+    <CreateUserModal
+        onClose={() => setShowCreateModal(false)}
+        onCreated={() => {
+            loadUsers();
+            setShowCreateModal(false);
+        }}
+    />
+)}
 
         </div>
     );

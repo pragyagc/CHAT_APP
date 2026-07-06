@@ -3,15 +3,18 @@ import { ApiwebService } from "../services";
 
 type Props = {
   refresh: boolean;
+  unreadConversations?: Set<string>;
   onSelectConversation: (conversation: any) => void;
 };
 
 export default function ConversationList({
   refresh,
+  unreadConversations = new Set(),
   onSelectConversation,
 }: Props) {
   const [conversations, setConversations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  
 
   async function loadConversations() {
     try {
@@ -59,11 +62,29 @@ export default function ConversationList({
               borderRadius: "8px",
               padding: "10px",
               marginBottom: "10px",
+              fontWeight: unreadConversations.has(conversation.id) ? "bold" : "normal",
             }}
           >
-            <strong>
-              {conversation.otherUserName}
-            </strong>
+            <div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  }}
+>
+  <strong>{conversation.otherUserName}</strong>
+
+  {unreadConversations.has(conversation.id) && (
+    <div
+      style={{
+        width: 10,
+        height: 10,
+        borderRadius: "50%",
+        backgroundColor: "#0084ff",
+      }}
+    />
+  )}
+</div>
 
             <br />
 

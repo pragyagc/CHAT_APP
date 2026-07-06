@@ -8,6 +8,7 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { CreateMessageDto } from './models/CreateMessageDto';
+export type { CreateUserDto } from './models/CreateUserDto';
 export type { LoginRequest } from './models/LoginRequest';
 export type { RegisterRequest } from './models/RegisterRequest';
 

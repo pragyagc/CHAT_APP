@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ConversationList from "../assets/ConversationList";
+import ConversationList from "../components/ConversationList";
 import UserList from "../components/UserList";
 import ChatWindow from "../components/ChatWindow";
 import { jwtDecode } from "jwt-decode";

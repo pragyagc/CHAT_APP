@@ -13,4 +13,7 @@ public interface IAdminService
     Task UnblockUserAsync(Guid id);
 
     Task DeleteUserAsync(Guid id);
+    Task RestoreUserAsync(Guid userId);
+    Task CreateUserAsync(CreateUserDto dto);
+
 }

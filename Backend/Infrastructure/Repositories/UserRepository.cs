@@ -16,13 +16,15 @@ public class UserRepository : IUserRepository
 
     public async Task<List<User>> GetAllAsync()
     {
-        return await _db.Users.ToListAsync();
+        return await _db.Users
+            .Where(x => !x.IsDeleted)
+            .ToListAsync();
     }
 
     public async Task<User?> GetByIdAsync(Guid id)
     {
         return await _db.Users
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == id&&!x.IsDeleted);
     }
 
     public async Task<User?> GetByEmailAsync(string email)

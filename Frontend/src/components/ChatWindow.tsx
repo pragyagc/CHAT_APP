@@ -2,7 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { ApiwebService } from "../services";
 import { connection,ensureConnection } from "../signalr/connection";
 
-export default function ChatWindow({ conversation }: any) {
+type Props = {
+  conversation: any;
+  onUnreadMessage?: (conversationId: string) => void;
+};
+
+export default function ChatWindow({
+  conversation,
+  onUnreadMessage,
+}: Props) {
   const [messages, setMessages] = useState<any[]>([]);
   const [text, setText] = useState("");
   const [currentUserId, setCurrentUserId] = useState("");
@@ -88,23 +96,42 @@ connection.on("UserOffline", (userId: string) => {
     setIsOnline(false);
   }
 });
-    connection.off("ReceiveMessage");
+    // connection.off("ReceiveMessage");
 
-    connection.on("ReceiveMessage", (msg: any) => {
-      if (msg.conversationId !== conversation.id) return;
+    // connection.on("ReceiveMessage", (msg: any) => {
+    //   if (msg.conversationId !== conversation.id) return;
 
-      setMessages((prev) => [...prev, msg]);
+    //   setMessages((prev) => [...prev, msg]);
 
-      if (isAtBottomRef.current) {
-        setTimeout(() => {
-          scrollToBottom();
-          markAsSeen();
-        }, 50);
-      } else {
-        setHasNewMessages(true);
-      }
-    });
+    //   if (isAtBottomRef.current) {
+    //     setTimeout(() => {
+    //       scrollToBottom();
+    //       markAsSeen();
+    //     }, 50);
+    //   } else {
+    //     setHasNewMessages(true);
+    //   }
+    // });
+  connection.on("ReceiveMessage", (msg: any) => {
 
+  // Message belongs to another conversation
+  if (msg.conversationId !== conversation.id) {
+    onUnreadMessage?.(msg.conversationId);
+    return;
+  }
+
+  // Current conversation
+  setMessages((prev) => [...prev, msg]);
+
+  if (isAtBottomRef.current) {
+    setTimeout(() => {
+      scrollToBottom();
+      markAsSeen();
+    }, 50);
+  } else {
+    setHasNewMessages(true);
+  }
+});
   connection.off("ConversationUpdated");
 
 connection.on("ConversationUpdated", (updatedMessages: any[]) => {

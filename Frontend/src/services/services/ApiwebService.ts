@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateMessageDto } from '../models/CreateMessageDto';
+import type { CreateUserDto } from '../models/CreateUserDto';
 import type { LoginRequest } from '../models/LoginRequest';
 import type { RegisterRequest } from '../models/RegisterRequest';
 
@@ -105,6 +106,22 @@ requestBody: LoginRequest,
     }
 
     /**
+     * @param requestBody 
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static postAdminUsers(
+requestBody: CreateUserDto,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/admin/users',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
+    /**
      * @param id 
      * @returns any OK
      * @throws ApiError
@@ -166,6 +183,23 @@ id: string,
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/admin/users/{id}/unblock',
+            path: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
+     * @param id 
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static putAdminUsersRestore(
+id: string,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/admin/users/{id}/restore',
             path: {
                 'id': id,
             },

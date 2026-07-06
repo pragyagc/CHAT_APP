@@ -34,46 +34,93 @@ public class ChatHub : Hub
         return await _userManager.IsInRoleAsync(user, "Admin");
     }
 
- 
+
+    //public override async Task OnConnectedAsync()
+    //{
+    //    var userIdValue = Context.User?
+    //        .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    //    if (userIdValue is not null)
+    //    {
+    //        var userId = Guid.Parse(userIdValue);
+
+    //        OnlineUsers.Add(userId, Context.ConnectionId);
+
+    //        await Clients.All.SendAsync("UserOnline", userId);
+    //    }
+
+    //    Console.WriteLine($"Connected: {Context.ConnectionId}");
+
+    //    await base.OnConnectedAsync();
+    //}
+
     public override async Task OnConnectedAsync()
     {
-        var userIdValue = Context.User?
-            .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var user = await _userManager.GetUserAsync(Context.User);
 
-        if (userIdValue is not null)
+        if (user == null)
         {
-            var userId = Guid.Parse(userIdValue);
-
-            OnlineUsers.Add(userId, Context.ConnectionId);
-
-            await Clients.All.SendAsync("UserOnline", userId);
+            Context.Abort();
+            return;
         }
+
+        // Prevent deleted users from connecting
+        if (user.IsDeleted)
+        {
+            Context.Abort();
+            return;
+        }
+
+        // Prevent blocked users from connecting
+        if (user.IsBlocked)
+        {
+            Context.Abort();
+            return;
+        }
+
+        OnlineUsers.Add(user.Id, Context.ConnectionId);
+
+        await Clients.All.SendAsync("UserOnline", user.Id);
 
         Console.WriteLine($"Connected: {Context.ConnectionId}");
 
         await base.OnConnectedAsync();
     }
 
-   
+    //public override async Task OnDisconnectedAsync(Exception? exception)
+    //{
+    //    var userIdValue = Context.User?
+    //        .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    //    if (userIdValue is not null)
+    //    {
+    //        var userId = Guid.Parse(userIdValue);
+
+    //        OnlineUsers.Remove(Context.ConnectionId);
+
+    //        await Clients.All.SendAsync("UserOffline", userId);
+    //    }
+
+    //    Console.WriteLine($"Disconnected: {Context.ConnectionId}");
+
+    //    await base.OnDisconnectedAsync(exception);
+    //}
+
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        var userIdValue = Context.User?
-            .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var user = await _userManager.GetUserAsync(Context.User);
 
-        if (userIdValue is not null)
+        if (user != null)
         {
-            var userId = Guid.Parse(userIdValue);
-
             OnlineUsers.Remove(Context.ConnectionId);
 
-            await Clients.All.SendAsync("UserOffline", userId);
+            await Clients.All.SendAsync("UserOffline", user.Id);
         }
 
         Console.WriteLine($"Disconnected: {Context.ConnectionId}");
 
         await base.OnDisconnectedAsync(exception);
     }
-
     public async Task JoinConversation(Guid conversationId)
     {
         var userIdValue = Context.User?

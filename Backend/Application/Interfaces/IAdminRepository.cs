@@ -14,4 +14,7 @@ public interface IAdminRepository
     Task UnblockUserAsync(Guid userId);
 
     Task DeleteUserAsync(Guid userId);
+    Task RestoreUserAsync(Guid userId);
+
+    Task CreateUserAsync(CreateUserDto dto);
 }

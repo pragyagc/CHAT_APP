@@ -17,6 +17,8 @@ const [showRegister, setShowRegister] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState<any>(null);
 const [currentUser, setCurrentUser] = useState<any>(null);
   const [currentUserId, setCurrentUserId] = useState<string>("");
+const [unreadConversations, setUnreadConversations] =useState<Set<string>>(new Set());
+
 
   // ---------------- TOKEN CHECK ----------------
   const validateToken = (token: string) => {
@@ -205,9 +207,18 @@ if (!isLoggedIn) {
 
         {/* EXISTING CONVERSATIONS */}
         <ConversationList
-          refresh={refresh}
-          onSelectConversation={setSelectedConversation}
-        />
+  refresh={refresh}
+  unreadConversations={unreadConversations}
+  onSelectConversation={(conversation) => {
+    setSelectedConversation(conversation);
+
+    setUnreadConversations((prev) => {
+      const next = new Set(prev);
+      next.delete(conversation.id);
+      return next;
+    });
+  }}
+/>
 
         <hr />
 
@@ -226,7 +237,16 @@ if (!isLoggedIn) {
       {/* CHAT AREA */}
       <div style={{ flex: 1 }}>
         {selectedConversation ? (
-          <ChatWindow conversation={selectedConversation} />
+         <ChatWindow
+  conversation={selectedConversation}
+  onUnreadMessage={(conversationId) => {
+    setUnreadConversations((prev) => {
+      const next = new Set(prev);
+      next.add(conversationId);
+      return next;
+    });
+  }}
+/>
         ) : (
           <div style={{ padding: 20 }}>
             Select a conversation to start chatting

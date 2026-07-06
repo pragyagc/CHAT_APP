@@ -12,5 +12,6 @@ public interface IConversationRepository
     Task<Conversation?> GetByIdAsync(Guid id);
     Task<bool> IsParticipantAsync(Guid conversationId, Guid userId);
     Task<Conversation?> GetBetweenUsersAsync(Guid user1Id, Guid user2Id);
+    Task<List<Guid>> GetParticipantIdsAsync(Guid conversationId);
 
 }

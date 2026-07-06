@@ -41,4 +41,13 @@ public class AdminService : IAdminService
     {
         await _adminRepository.DeleteUserAsync(userId);
     }
+    public async Task RestoreUserAsync(Guid userId)
+    {
+        await _adminRepository.RestoreUserAsync(userId);
+    }
+
+    public async Task CreateUserAsync(CreateUserDto dto)
+    {
+        await _adminRepository.CreateUserAsync(dto);
+    }
 }

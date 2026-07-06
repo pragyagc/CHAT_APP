@@ -48,6 +48,12 @@ public class AuthService : IAuthService
         if (user == null)
             return null;
 
+        if (user.IsDeleted)
+            throw new Exception("This account has been deleted.");
+
+        if (user.IsBlocked)
+            throw new Exception("Your account has been blocked.");
+
         var result = await _signInManager.CheckPasswordSignInAsync(
             user,
             request.Password,
@@ -77,6 +83,14 @@ public class AuthService : IAuthService
 
         if (user == null)
             return null;
+
+        // Soft deleted account
+        if (user.IsDeleted)
+            throw new Exception("This account has been deleted.");
+
+        // Blocked account
+        if (user.IsBlocked)
+            throw new Exception("This account has been blocked.");
 
         var result = await _signInManager.CheckPasswordSignInAsync(
             user,

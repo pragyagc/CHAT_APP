@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Text;
 using APIWEB.Hubs;
+using Application.DTOs.Admin;
 using Application.DTOs.Auth;
 using Application.DTOs.Message;
 using Application.Interfaces;
@@ -399,6 +400,33 @@ IAdminService service) =>
     return Results.Ok(new
     {
         Message = "User deleted successfully."
+    });
+});
+
+admin.MapPut("/users/{id:guid}/restore",
+async (
+    Guid id,
+    IAdminService service) =>
+{
+    await service.RestoreUserAsync(id);
+
+    return Results.Ok(new
+    {
+        Message = "User restored successfully."
+    });
+});
+
+
+admin.MapPost("/users",
+async (
+    CreateUserDto dto,
+    IAdminService service) =>
+{
+    await service.CreateUserAsync(dto);
+
+    return Results.Ok(new
+    {
+        Message = "User created successfully."
     });
 });
 

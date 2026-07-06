@@ -2,6 +2,7 @@
 using Application.Interfaces;
 using Domain.Entities;
 using Infrastructure.Data;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -167,5 +168,11 @@ public class ConversationService : IConversationService
         return await _repository.IsParticipantAsync(
             conversationId,
             userId);
+    }
+
+    public async Task<List<Guid>> GetParticipantIdsAsync(Guid conversationId)
+    {
+        return await _repository
+            .GetParticipantIdsAsync(conversationId);
     }
 }

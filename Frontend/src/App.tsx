@@ -151,7 +151,12 @@ export default function App() {
   };
 
   // ---------------- UI ----------------
-  if (loading) return <div>Loading...</div>;
+  if (loading) return (
+    <div className="app-loading">
+      <div className="spinner" />
+      Loading...
+    </div>
+  );
 
   if (!isLoggedIn) {
     return showRegister ? (
@@ -168,48 +173,62 @@ export default function App() {
   }
 
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
+    <div className="app-layout">
       {/* SIDEBAR */}
-      <div style={{ width: 330, borderRight: "1px solid #ddd" }}>
-        <div style={{ padding: 20 }}>
-          <b>{currentUser?.userName}</b>
-          <div style={{ fontSize: 12 }}>{currentUser?.email}</div>
+      <div className="sidebar">
+        <div className="sidebar-header">
+          <div className="sidebar-user">
+            <div className="sidebar-avatar">
+              {currentUser?.userName?.charAt(0).toUpperCase()}
+            </div>
+            <div className="sidebar-user-info">
+              <strong>{currentUser?.userName}</strong>
+              <span>{currentUser?.email}</span>
+            </div>
+          </div>
+          <button className="logout-btn" onClick={logout} title="Logout">⏻</button>
         </div>
 
-        <ConversationList
-          refresh={refresh}
-          unreadConversations={unreadConversations}
-          onSelectConversation={(c) => {
-            selectedConversationRef.current = c;
-            setSelectedConversation(c);
-            setUnreadConversations((prev) => {
-              const next = new Map(prev);
-              next.delete(c.id);
-              return next;
-            });
-          }}
-        />
+        <div className="sidebar-scroll">
+          <ConversationList
+            refresh={refresh}
+            unreadConversations={unreadConversations}
+            selectedId={selectedConversation?.id}
+            onSelectConversation={(c) => {
+              selectedConversationRef.current = c;
+              setSelectedConversation(c);
+              setUnreadConversations((prev) => {
+                const next = new Map(prev);
+                next.delete(c.id);
+                return next;
+              });
+            }}
+          />
 
-        <UserList
-          currentUserId={currentUserId}
-          onConversationCreated={() => setRefresh((p) => !p)}
-          onSelectConversation={setSelectedConversation}
-        />
-
-        <button onClick={logout}>Logout</button>
+          <UserList
+            currentUserId={currentUserId}
+            onConversationCreated={() => setRefresh((p) => !p)}
+            onSelectConversation={(c) => {
+              selectedConversationRef.current = c;
+              setSelectedConversation(c);
+            }}
+          />
+        </div>
       </div>
 
       {/* CHAT */}
-      <div style={{ flex: 1 }}>
-        {selectedConversation ? (
-          <ChatWindow
-            conversation={selectedConversation}
-            currentUserId={currentUserId}
-          />
-        ) : (
-          <div>Select a conversation</div>
-        )}
-      </div>
+      {selectedConversation ? (
+        <ChatWindow
+          conversation={selectedConversation}
+          currentUserId={currentUserId}
+        />
+      ) : (
+        <div className="empty-chat">
+          <div className="empty-chat-icon">💬</div>
+          <h3>Your Messages</h3>
+          <p>Select a conversation or start a new chat</p>
+        </div>
+      )}
     </div>
   );
 }

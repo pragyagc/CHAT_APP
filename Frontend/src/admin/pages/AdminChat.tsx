@@ -3,44 +3,31 @@ import AdminConversationList from "../components/AdminConversationList";
 import AdminChatWindow from "../components/AdminChatWindow";
 
 export default function AdminChat() {
+  const [conversation, setConversation] = useState<any>(null);
 
-    const [conversation, setConversation] = useState<any>(null);
-
-    return (
-
-        <div
-            style={{
-                display: "flex",
-                height: "100%"
-            }}
-        >
-
-            <div
-                style={{
-                    width: 300,
-                    borderRight: "1px solid lightgray"
-                }}
-            >
-                <AdminConversationList
-                    onSelectConversation={setConversation}
-                />
-            </div>
-
-            <div style={{ flex: 1 }}>
-
-                {conversation ? (
-                    <AdminChatWindow
-                        conversation={conversation}
-                    />
-                ) : (
-                    <div style={{ padding: 20 }}>
-                        Select a user
-                    </div>
-                )}
-
-            </div>
-
+  return (
+    <>
+      <div className="admin-page-title">Messages</div>
+      <div className="admin-chat-layout" style={{ height: "calc(100vh - 120px)" }}>
+        <div className="admin-chat-sidebar">
+          <div className="admin-chat-sidebar-title">Users</div>
+          <div className="admin-chat-sidebar-scroll">
+            <AdminConversationList
+              selectedId={conversation?.id}
+              onSelectConversation={setConversation}
+            />
+          </div>
         </div>
 
-    );
+        {conversation ? (
+          <AdminChatWindow conversation={conversation} />
+        ) : (
+          <div className="admin-empty-chat">
+            <div className="admin-empty-chat-icon">💬</div>
+            <p>Select a user to start messaging</p>
+          </div>
+        )}
+      </div>
+    </>
+  );
 }

@@ -11,41 +11,55 @@ export default function Register({ onRegister, goToLogin }: Props) {
   const [userName, setUserName] = useState("");
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Register</h2>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-logo">
+          <div className="auth-logo-icon">💬</div>
+          <h1>Create account</h1>
+          <p>Join and start chatting today</p>
+        </div>
 
-      <input
-        placeholder="Username"
-        value={userName}
-        onChange={(e) => setUserName(e.target.value)}
-      />
+        <div className="auth-field">
+          <label>Username</label>
+          <input
+            placeholder="johndoe"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+          />
+        </div>
 
-      <br />
+        <div className="auth-field">
+          <label>Email</label>
+          <input
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
 
-      <input
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <div className="auth-field">
+          <label>Password</label>
+          <input
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
 
-      <br />
+        <button
+          className="auth-btn"
+          onClick={() => onRegister(email, password, userName)}
+        >
+          Create Account
+        </button>
 
-      <input
-        placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-
-      <br />
-
-      <button onClick={() => onRegister(email, password, userName)}>
-        Register
-      </button>
-
-      <p onClick={goToLogin} style={{ cursor: "pointer" }}>
-        Login
-      </p>
+        <div className="auth-switch">
+          Already have an account?{" "}
+          <span onClick={goToLogin}>Sign in</span>
+        </div>
+      </div>
     </div>
   );
 }

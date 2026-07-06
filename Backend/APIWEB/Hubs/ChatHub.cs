@@ -215,4 +215,67 @@ public class ChatHub : Hub
     }
 
 
+    public async Task Typing(Guid conversationId)
+    {
+        var userIdValue = Context.User?
+            .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (userIdValue is null)
+            throw new HubException("Unauthorized");
+
+        var userId = Guid.Parse(userIdValue);
+
+        var allowed = await _conversationService.IsParticipantAsync(conversationId, userId);
+
+        if (!allowed)
+        {
+            var isAdmin = await IsAdminAsync();
+
+            if (!isAdmin)
+                throw new HubException("Not allowed");
+        }
+
+        var user = await _userManager.GetUserAsync(Context.User);
+
+        if (user == null)
+            return;
+
+        await Clients.OthersInGroup(conversationId.ToString())
+            .SendAsync(
+                "UserTyping",
+                conversationId,
+                user.Id,
+                user.UserName
+            );
+    }
+
+    public async Task StopTyping(Guid conversationId)
+    {
+        var userIdValue = Context.User?
+            .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (userIdValue is null)
+            throw new HubException("Unauthorized");
+
+        var userId = Guid.Parse(userIdValue);
+
+        var allowed = await _conversationService.IsParticipantAsync(conversationId, userId);
+
+        if (!allowed)
+        {
+            var isAdmin = await IsAdminAsync();
+
+            if (!isAdmin)
+                throw new HubException("Not allowed");
+        }
+
+        await Clients.OthersInGroup(conversationId.ToString())
+            .SendAsync(
+                "UserStoppedTyping",
+                conversationId,
+                userId
+            );
+    }
+
+
 }

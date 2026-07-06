@@ -10,33 +10,45 @@ export default function Login({ onLogin, goToRegister }: Props) {
   const [password, setPassword] = useState("");
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Login</h2>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-logo">
+          <div className="auth-logo-icon">💬</div>
+          <h1>Welcome back</h1>
+          <p>Sign in to continue chatting</p>
+        </div>
 
-      <input
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <div className="auth-field">
+          <label>Email</label>
+          <input
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && onLogin(email, password)}
+          />
+        </div>
 
-      <br />
+        <div className="auth-field">
+          <label>Password</label>
+          <input
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && onLogin(email, password)}
+          />
+        </div>
 
-      <input
-        placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <button className="auth-btn" onClick={() => onLogin(email, password)}>
+          Sign In
+        </button>
 
-      <br />
-
-      <button onClick={() => onLogin(email, password)}>
-        Login
-      </button>
-
-      <p onClick={goToRegister} style={{ cursor: "pointer" }}>
-        Register
-      </p>
+        <div className="auth-switch">
+          Don't have an account?{" "}
+          <span onClick={goToRegister}>Create one</span>
+        </div>
+      </div>
     </div>
   );
 }

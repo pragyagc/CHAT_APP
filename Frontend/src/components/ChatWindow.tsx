@@ -1,38 +1,31 @@
 import { useEffect, useRef, useState } from "react";
 import { ApiwebService } from "../services";
-import { connection,ensureConnection } from "../signalr/connection";
+import { connection, ensureConnection } from "../signalr/connection";
 
 type Props = {
   conversation: any;
   currentUserId: string;
-  onUnreadMessage?: (conversationId: string) => void;
 };
 
- export default function ChatWindow({
-  conversation,
-  currentUserId,
-  onUnreadMessage,
-}: Props){
+export default function ChatWindow({ conversation, currentUserId }: Props) {
   const [messages, setMessages] = useState<any[]>([]);
   const [text, setText] = useState("");
   const [hasNewMessages, setHasNewMessages] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isTypingRef = useRef(false);
   const canSend = !conversation?.isAdminConversation;
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const [isOnline, setIsOnline] = useState(false);
   const isAtBottomRef = useRef(true);
   const isTabActiveRef = useRef(true);
   const currentUserIdRef = useRef(currentUserId);
   useEffect(() => { currentUserIdRef.current = currentUserId; }, [currentUserId]);
 
-
- 
-
-  // ---------------- SCROLL ----------------
   const checkIfAtBottom = () => {
     const el = scrollRef.current;
     if (!el) return true;
-
     return el.scrollHeight - el.scrollTop - el.clientHeight < 80;
   };
 
@@ -43,7 +36,6 @@ type Props = {
     });
   };
 
-  // ---------------- MARK AS SEEN (SAFE) ----------------
   const markAsSeen = () => {
     if (!isTabActiveRef.current) return;
     if (!conversation?.id) return;
@@ -51,66 +43,41 @@ type Props = {
     connection.invoke("MarkAsSeen", conversation.id).catch(() => {});
   };
 
-  // ---------------- LOAD MESSAGES ----------------
   async function loadMessages() {
-    const data = await ApiwebService.getMessagesConversation(
-      conversation.id
-    );
-
+    const data = await ApiwebService.getMessagesConversation(conversation.id);
     setMessages(data ?? []);
-
     setTimeout(() => {
       scrollToBottom(false);
-      const hasUnseenFromOther = (data ?? []).some(
+      const hasUnseen = (data ?? []).some(
         (m: any) => m.senderId !== currentUserIdRef.current && !m.isSeen
       );
-      if (checkIfAtBottom() && hasUnseenFromOther) markAsSeen();
+      if (checkIfAtBottom() && hasUnseen) markAsSeen();
     }, 50);
   }
 
-
-
-
-  // ---------------- SEND MESSAGE ----------------
   async function sendMessage() {
-     if (!canSend) return;
-    if (!text.trim()) return;
-
+    if (!canSend || !text.trim()) return;
     await connection.invoke("SendMessage", conversation.id, text);
-
     setText("");
-
-    isTabActiveRef.current=true;
+    isTabActiveRef.current = true;
   }
 
-  // ---------------- TAB VISIBILITY FIX ----------------
-    useEffect(() => {
-  const handleVisibility = () => {
-    isTabActiveRef.current =
-      document.visibilityState === "visible";
-  };
+  useEffect(() => {
+    const handleVisibility = () => {
+      isTabActiveRef.current = document.visibilityState === "visible";
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
 
-  document.addEventListener("visibilitychange", handleVisibility);
-
-  return () => {
-    document.removeEventListener(
-      "visibilitychange",
-      handleVisibility
-    );
-  };
-}, []);
-
-  // ---------------- INIT ----------------
   useEffect(() => {
     if (!conversation?.id) return;
-
     let mounted = true;
 
     const onReceiveMessage = (msg: any) => {
       if (msg.conversationId !== conversation.id) return;
-      setMessages(prev => {
-        const exists = prev.some(x => x.id === msg.id);
-        if (exists) return prev;
+      setMessages((prev) => {
+        if (prev.some((x) => x.id === msg.id)) return prev;
         return [...prev, msg];
       });
       const isMine = msg.senderId === currentUserIdRef.current;
@@ -126,32 +93,59 @@ type Props = {
 
     const onMessagesSeen = (conversationId: string) => {
       if (conversationId !== conversation.id) return;
-      setMessages(prev => prev.map(m => ({ ...m, isSeen: true })));
+      setMessages((prev) => prev.map((m) => ({ ...m, isSeen: true })));
     };
 
     const onUserOnline = (userId: string) => {
-      if (userId === conversation.otherUserId) setIsOnline(true);
+      if (userId?.toLowerCase() === conversation.otherUserId?.toLowerCase()) setIsOnline(true);
     };
 
     const onUserOffline = (userId: string) => {
-      if (userId === conversation.otherUserId) setIsOnline(false);
+      if (userId?.toLowerCase() === conversation.otherUserId?.toLowerCase()) setIsOnline(false);
     };
+
+    const onUserTyping = (
+      conversationId: string,
+      userId: string,
+      userName: string
+      ) => {
+        if (conversationId !== conversation.id) return;
+
+        if (userId === currentUserIdRef.current) return;
+
+        setIsOtherTyping(true);
+      };
+
+      const onUserStoppedTyping = (
+        conversationId: string,
+        userId: string
+      ) => {
+        if (conversationId !== conversation.id) return;
+
+        if (userId === currentUserIdRef.current) return;
+
+        setIsOtherTyping(false);
+      };
 
     const init = async () => {
       await ensureConnection();
       if (!mounted) return;
-
       setMessages([]);
       setHasNewMessages(false);
       loadMessages();
-
       connection.invoke("JoinConversation", conversation.id).catch(() => {});
+      // check initial online status
+      connection.invoke("IsUserOnline", conversation.otherUserId)
+        .then((online: boolean) => { if (mounted) setIsOnline(online); })
+        .catch(() => {});
     };
 
     connection.on("ReceiveMessage", onReceiveMessage);
     connection.on("MessagesSeen", onMessagesSeen);
     connection.on("UserOnline", onUserOnline);
     connection.on("UserOffline", onUserOffline);
+    connection.on("UserTyping", onUserTyping);
+    connection.on("UserStoppedTyping", onUserStoppedTyping);
 
     init();
 
@@ -161,141 +155,63 @@ type Props = {
       connection.off("MessagesSeen", onMessagesSeen);
       connection.off("UserOnline", onUserOnline);
       connection.off("UserOffline", onUserOffline);
+      connection.off("UserTyping", onUserTyping);
+      connection.off("UserStoppedTyping", onUserStoppedTyping);
     };
   }, [conversation?.id]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        position: "relative",
-      }}
-    >
+    <div className="chat-window">
+      {/* HEADER */}
       <div className="chat-header">
-
-  <div className="chat-user">
-
-    <div className="avatar-wrapper">
-
-      <div className="avatar">
-        {conversation.otherUserName.charAt(0).toUpperCase()}
+        <div className="chat-header-user">
+          <div className="chat-header-avatar">
+            {conversation.otherUserName.charAt(0).toUpperCase()}
+            <div className={`chat-header-dot ${isOnline ? "online" : "offline"}`} />
+          </div>
+          <div className="chat-header-info">
+            <strong>{conversation.otherUserName}</strong>
+            <span className={isOnline ? "online" : "offline"}>
+              {isOnline ? "Online" : "Offline"}
+            </span>
+          </div>
+        </div>
+        <div className="chat-header-actions">
+          <button className="chat-action-btn">📞</button>
+          <button className="chat-action-btn">📹</button>
+        </div>
       </div>
-
-      <div
-        className={`online-dot ${
-          isOnline ? "online" : "offline"
-        }`}
-      />
-
-    </div>
-
-    <div>
-
-      <div className="user-name">
-        {conversation.otherUserName}
-      </div>
-
-      <div
-        className={`user-status ${
-          isOnline
-            ? "status-online"
-            : "status-offline"
-        }`}
-      >
-        {isOnline ? "Online" : "Offline"}
-      </div>
-
-    </div>
-
-  </div>
-
-  <div className="chat-actions">
-
-    <button className="chat-action-btn">
-      📞
-    </button>
-
-    <button className="chat-action-btn">
-      📹
-    </button>
-
-  </div>
-
-</div>
 
       {/* MESSAGES */}
       <div
         ref={scrollRef}
+        className="messages-area"
         onScroll={() => {
           isAtBottomRef.current = checkIfAtBottom();
           if (isAtBottomRef.current) {
             setHasNewMessages(false);
-            const hasUnseenFromOther = messages.some(
+            const hasUnseen = messages.some(
               (m) => m.senderId !== currentUserIdRef.current && !m.isSeen
             );
-            if (hasUnseenFromOther) markAsSeen();
+            if (hasUnseen) markAsSeen();
           }
-        }}
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          padding: "15px",
-          background: "#f5f5f5",
         }}
       >
         {messages.map((m) => {
           const isMine = m.senderId === currentUserIdRef.current;
-
           return (
-            <div
-              key={m.id}
-              style={{
-                display: "flex",
-                justifyContent: isMine
-                  ? "flex-end"
-                  : "flex-start",
-                marginBottom: "10px",
-              }}
-            >
-              <div
-                style={{
-                  background: isMine ? "#0084ff" : "#e4e6eb",
-                  color: isMine ? "#fff" : "#000",
-                  padding: "10px 15px",
-                  borderRadius: "18px",
-                  maxWidth: "60%",
-                  wordBreak: "break-word",
-                }}
-              >
+            <div key={m.id} className={`msg-row ${isMine ? "mine" : "theirs"}`}>
+              <div className="msg-bubble">
                 {m.text}
-
-                {/* TIME */}
-                <div
-                  style={{
-                    fontSize: "11px",
-                    opacity: 0.7,
-                    marginTop: 4,
-                    textAlign: "right",
-                  }}
-                >
+                <div className="msg-meta">
                   {m.createdAt &&
                     new Date(m.createdAt).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
                 </div>
-
-                {/* SENT / SEEN */}
                 {isMine && (
-                  <div
-                    style={{
-                      fontSize: "11px",
-                      marginTop: 2,
-                      textAlign: "right",
-                    }}
-                  >
+                  <div className="msg-status">
                     {m.isSeen ? "✓✓ Seen" : "✓ Sent"}
                   </div>
                 )}
@@ -305,71 +221,72 @@ type Props = {
         })}
       </div>
 
-      {/* NEW MESSAGE BUTTON */}
+      {/* NEW MESSAGES BANNER */}
       {hasNewMessages && (
         <div
-         
-        onClick={() => {
-    scrollToBottom();
-    setHasNewMessages(false);
-    markAsSeen();
-}}
-          style={{
-            position: "absolute",
-            bottom: 90,
-            right: 20,
-            background: "#0084ff",
-            color: "#fff",
-            padding: "8px 12px",
-            borderRadius: "20px",
-            cursor: "pointer",
-            fontSize: "12px",
+          className="new-msg-banner"
+          onClick={() => {
+            scrollToBottom();
+            setHasNewMessages(false);
+            markAsSeen();
           }}
         >
           New messages ↓
         </div>
       )}
 
+      {isOtherTyping && (
+        <div
+          style={{
+            padding: "6px 14px",
+            fontSize: "13px",
+            color: "#666",
+            fontStyle: "italic",
+          }}
+        >
+          {conversation.otherUserName} is typing...
+        </div>
+      )}
+
       {/* INPUT */}
       {canSend ? (
-  <div
-    style={{
-      display: "flex",
-      padding: "10px",
-      borderTop: "1px solid #ddd",
-    }}
-  >
-    <input
-      value={text}
-      onChange={(e) => setText(e.target.value)}
-      style={{
-        flex: 1,
-        padding: "10px",
-        borderRadius: "20px",
-      }}
-      placeholder="Type a message..."
-    />
+        <div className="chat-input-area">
+          <input
+            className="chat-input"
+            value={text}
+            onChange={(e) => {
+              setText(e.target.value);
 
-    <button
-      onClick={sendMessage}
-      style={{ marginLeft: 10 }}
-    >
-      Send
-    </button>
-  </div>
-) : (
-  <div
-    style={{
-      padding: "16px",
-      textAlign: "center",
-      color: "#666",
-      borderTop: "1px solid #ddd",
-      background: "#fafafa",
-    }}
-  >
-    This is an admin conversation. You cannot reply.
-  </div>
-)}
+              if (!isTypingRef.current) {
+                isTypingRef.current = true;
+                connection.invoke("Typing", conversation.id).catch(() => {});
+              }
+
+              if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+              }
+
+              typingTimeoutRef.current = setTimeout(() => {
+                isTypingRef.current = false;
+                connection.invoke("StopTyping", conversation.id).catch(() => {});
+              }, 1000);
+              }}
+            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            placeholder="Type a message..."
+          />
+          <button
+            className="send-btn"
+            onClick={sendMessage}
+            disabled={!text.trim()}
+          >
+            ➤
+          </button>
+        </div>
+      ) : (
+        <div className="admin-notice">
+          This is an admin conversation. You cannot reply.
+        </div>
+      )}
     </div>
   );
 }

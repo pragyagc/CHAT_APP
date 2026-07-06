@@ -2,96 +2,92 @@ import { useEffect, useState } from "react";
 import { ApiwebService } from "../../services";
 import UsersPage from "./UsersPage";
 import AdminChat from "./AdminChat";
+import "../styles/admin.css";
 
-type Props = {
-    onLogout: () => void;
-};
+type Props = { onLogout: () => void };
 
 export default function AdminDashboard({ onLogout }: Props) {
+  const [dashboard, setDashboard] = useState<any>(null);
+  const [page, setPage] = useState("dashboard");
 
-    const [dashboard, setDashboard] = useState<any>();
-    const [page, setPage] = useState("dashboard");
+  useEffect(() => {
+    ApiwebService.getAdminDashboard().then(setDashboard).catch(() => {});
+  }, []);
 
-    useEffect(() => {
-        loadDashboard();
-    }, []);
+  const navItems = [
+    { key: "dashboard", icon: "📊", label: "Dashboard" },
+    { key: "users",     icon: "👥", label: "Users" },
+    { key: "messages",  icon: "💬", label: "Messages" },
+  ];
 
-    async function loadDashboard() {
-        const data = await ApiwebService.getAdminDashboard();
-        setDashboard(data);
-    }
-
-    return (
-        <div style={{ display: "flex", height: "100vh" }}>
-
-            {/* Sidebar */}
-            <div
-                style={{
-                    width: 230,
-                    background: "#222",
-                    color: "white",
-                    padding: 20
-                }}
-            >
-                <h2>Admin</h2>
-
-                <button
-                    style={{ width: "100%", marginBottom: 10 }}
-                    onClick={() => setPage("dashboard")}
-                >
-                    Dashboard
-                </button>
-
-                <button
-                    style={{ width: "100%", marginBottom: 10 }}
-                    onClick={() => setPage("users")}
-                >
-                    Users
-                </button>
-
-                <button
-                     style={{ width: "100%", marginBottom: 10 }}
-                     onClick={() => setPage("messages")}
-                >
-                    Messages
-                </button>
-
-                <button
-                    style={{ width: "100%" }}
-                    onClick={onLogout}
-                >
-                    Logout
-                </button>
-            </div>
-
-            {/* Content */}
-
-            <div style={{ flex: 1, padding: 30 }}>
-
-                {page === "dashboard" && dashboard && (
-
-                    <>
-                        <h1>Dashboard</h1>
-
-                        <h3>Total Users : {dashboard.totalUsers}</h3>
-
-                        <h3>Total Messages : {dashboard.totalMessages}</h3>
-
-                        <h3>Total Conversations : {dashboard.totalConversations}</h3>
-                    </>
-
-                )}
-
-                {page === "users" && (
-                    <UsersPage />
-                )}
-
-                {page === "messages" && (
-                    <AdminChat />
-                )}
-
-            </div>
-
+  return (
+    <div className="admin-layout">
+      {/* SIDEBAR */}
+      <div className="admin-sidebar">
+        <div className="admin-sidebar-brand">
+          <div className="admin-sidebar-brand-icon">🛡️</div>
+          <div>
+            <span>ChatAdmin</span>
+            <small>Control Panel</small>
+          </div>
         </div>
-    );
+
+        <nav className="admin-nav">
+          {navItems.map((item) => (
+            <button
+              key={item.key}
+              className={`admin-nav-item${page === item.key ? " active" : ""}`}
+              onClick={() => setPage(item.key)}
+            >
+              <span className="admin-nav-item-icon">{item.icon}</span>
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="admin-sidebar-footer">
+          <button className="admin-logout-btn" onClick={onLogout}>
+            <span className="admin-nav-item-icon">🚪</span>
+            Logout
+          </button>
+        </div>
+      </div>
+
+      {/* CONTENT */}
+      <div className="admin-content">
+        {page === "dashboard" && (
+          <>
+            <div className="admin-page-title">Dashboard</div>
+            <div className="admin-stats-grid">
+              <div className="admin-stat-card">
+                <div className="admin-stat-icon purple">👥</div>
+                <div className="admin-stat-info">
+                  <strong>{dashboard?.totalUsers ?? "—"}</strong>
+                  <span>Total Users</span>
+                </div>
+              </div>
+              <div className="admin-stat-card">
+                <div className="admin-stat-icon green">💬</div>
+                <div className="admin-stat-info">
+                  <strong>{dashboard?.totalMessages ?? "—"}</strong>
+                  <span>Total Messages</span>
+                </div>
+              </div>
+              <div className="admin-stat-card">
+                <div className="admin-stat-icon blue">🗂️</div>
+                <div className="admin-stat-info">
+                  <strong>{dashboard?.totalConversations ?? "—"}</strong>
+                  <span>Conversations</span>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {page === "users" && <UsersPage />}
+
+        {page === "messages" && <AdminChat />}
+      </div>
+    </div>
+  );
 }

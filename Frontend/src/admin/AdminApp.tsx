@@ -3,6 +3,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import { OpenAPI } from "../services/core/OpenAPI";
 import { connection } from "../signalr/connection";
+import "./styles/admin.css";
 export default function AdminApp() {
 
     const [isLoggedIn, setIsLoggedIn] = useState(false);

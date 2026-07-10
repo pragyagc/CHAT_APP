@@ -5,21 +5,30 @@ import CreateUserModal from "../components/CreateUserModal";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
+
+  // When set, renders UserDetails instead of the table (drill-down navigation)
   const [selectedUser, setSelectedUser] = useState<any>(null);
+
+  // Controls visibility of the Create User modal
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => { loadUsers(); }, []);
 
   async function loadUsers() {
+    // GET /admin/users — returns all users including admins, blocked, and deleted
     const result = await ApiwebService.getAdminUsers();
     setUsers(result);
   }
 
+  // If a user is selected, show their detail page instead of the table
   if (selectedUser)
     return (
       <UserDetails
         userId={selectedUser.id}
-        goBack={() => { setSelectedUser(null); loadUsers(); }}
+        goBack={() => {
+          setSelectedUser(null); // Go back to the table
+          loadUsers();           // Refresh the table in case status changed
+        }}
       />
     );
 
@@ -30,6 +39,7 @@ export default function UsersPage() {
       <div className="admin-table-card">
         <div className="admin-table-header">
           <h3>All Users</h3>
+          {/* Opens the Create User modal */}
           <button
             className="admin-btn admin-btn-primary admin-btn-sm"
             onClick={() => setShowCreateModal(true)}
@@ -51,6 +61,8 @@ export default function UsersPage() {
           <tbody>
             {users.map((user) => (
               <tr key={user.id}>
+
+                {/* Avatar + username */}
                 <td>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div
@@ -67,12 +79,17 @@ export default function UsersPage() {
                     <span style={{ fontWeight: 600 }}>{user.userName}</span>
                   </div>
                 </td>
+
                 <td style={{ color: "#6b7280" }}>{user.email}</td>
+
+                {/* Role badge: purple for Admin, grey for User */}
                 <td>
                   <span className={`badge ${user.role === "Admin" ? "badge-purple" : "badge-gray"}`}>
                     {user.role ?? "User"}
                   </span>
                 </td>
+
+                {/* Status badge: priority order — Deleted > Blocked > Active */}
                 <td>
                   {user.isDeleted ? (
                     <span className="badge badge-gray">Deleted</span>
@@ -82,6 +99,8 @@ export default function UsersPage() {
                     <span className="badge badge-green">Active</span>
                   )}
                 </td>
+
+                {/* View button — navigates to UserDetails */}
                 <td>
                   <button
                     className="admin-btn admin-btn-ghost admin-btn-sm"
@@ -96,10 +115,14 @@ export default function UsersPage() {
         </table>
       </div>
 
+      {/* Create User modal — rendered on top of the table when showCreateModal is true */}
       {showCreateModal && (
         <CreateUserModal
           onClose={() => setShowCreateModal(false)}
-          onCreated={() => { loadUsers(); setShowCreateModal(false); }}
+          onCreated={() => {
+            loadUsers();              // Refresh table after creation
+            setShowCreateModal(false);
+          }}
         />
       )}
     </>

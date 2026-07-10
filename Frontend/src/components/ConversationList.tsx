@@ -3,11 +3,17 @@ import { ApiwebService } from "../services";
 
 type Props = {
   refresh: boolean;
+  prefetchedList?: any[] | null;             // Pre-fetched conversations from UserList — skips the re-fetch
+  latestMessage?: any;
   unreadConversations?: Map<string, number>;
   onSelectConversation: (conversation: any) => void;
   selectedId?: string;
 };
 
+/**
+ * A set of gradient colors used for conversation avatars.
+ * Each user gets a consistent color based on a hash of their name.
+ */
 const AVATAR_COLORS = [
   "linear-gradient(135deg,#f093fb,#f5576c)",
   "linear-gradient(135deg,#4facfe,#00f2fe)",
@@ -17,6 +23,11 @@ const AVATAR_COLORS = [
   "linear-gradient(135deg,#ffecd2,#fcb69f)",
 ];
 
+/**
+ * Deterministically picks an avatar color for a given name.
+ * Sums the char codes of all characters, then mods by the number of colors.
+ * Same name always gets the same color — no randomness.
+ */
 function avatarColor(name: string) {
   let n = 0;
   for (let i = 0; i < name.length; i++) n += name.charCodeAt(i);
@@ -25,6 +36,8 @@ function avatarColor(name: string) {
 
 export default function ConversationList({
   refresh,
+  prefetchedList,
+  latestMessage,
   unreadConversations = new Map(),
   onSelectConversation,
   selectedId,
@@ -32,11 +45,17 @@ export default function ConversationList({
   const [conversations, setConversations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  /**
+   * Fetches all conversations from the API.
+   *
+   * Filter: only show conversations that have at least one message (lastMessage is non-empty).
+   * Why? A conversation is created as soon as two users connect, even before any messages.
+   * We don't want empty conversations cluttering the sidebar — they appear in UserList instead.
+   */
   async function loadConversations() {
     try {
       setLoading(true);
       const data = await ApiwebService.getConversations();
-      // only show conversations that have at least one message
       setConversations((data ?? []).filter((c: any) => c.lastMessage));
     } catch (err) {
       console.error("Failed to load conversations", err);
@@ -46,13 +65,50 @@ export default function ConversationList({
   }
 
   useEffect(() => {
+    // If UserList already fetched the list, use it directly — no extra API call
+    if (prefetchedList != null) {
+      setConversations(prefetchedList.filter((c: any) => c.lastMessage));
+      setLoading(false);
+      return;
+    }
     loadConversations();
-  }, [refresh]);
+  }, [refresh, prefetchedList]);
+
+
+  useEffect(() => {
+
+    if (!latestMessage) return;
+
+    setConversations(prev => {
+
+        const updated = [...prev];
+
+        const index = updated.findIndex(
+            c => c.id === latestMessage.conversationId
+        );
+
+        if (index === -1)
+            return prev;
+
+        const conversation = {
+            ...updated[index],
+            lastMessage: latestMessage.text
+        };
+
+        updated.splice(index, 1);
+
+        updated.unshift(conversation);
+
+        return updated;
+    });
+
+}, [latestMessage]);
 
   if (loading) return <div style={{ padding: "16px", color: "#65676b", fontSize: 13 }}>Loading...</div>;
 
   return (
     <div>
+      {/* Section title — only shown if there are conversations */}
       {conversations.length > 0 && (
         <div className="sidebar-section-title">Messages</div>
       )}
@@ -63,14 +119,19 @@ export default function ConversationList({
         </div>
       ) : (
         conversations.map((c) => {
+          // Get the unread count for this conversation (0 if not in the map)
           const unread = unreadConversations.get(c.id) ?? 0;
+
+          // Highlight this item if it's the currently open conversation
           const isActive = c.id === selectedId;
+
           return (
             <div
               key={c.id}
               className={`conv-item${isActive ? " active" : ""}`}
               onClick={() => onSelectConversation(c)}
             >
+              {/* Colored avatar circle with the first letter of the other user's name */}
               <div
                 className="conv-avatar"
                 style={{ background: avatarColor(c.otherUserName ?? "?") }}
@@ -79,11 +140,13 @@ export default function ConversationList({
               </div>
 
               <div className="conv-info">
+                {/* Bold name if there are unread messages */}
                 <div className={`conv-name${unread > 0 ? " unread" : ""}`}>
                   {c.otherUserName}
                 </div>
               </div>
 
+              {/* Unread count badge — only shown when unread > 0, caps at "99+" */}
               {unread > 0 && (
                 <div className="conv-badge">{unread > 99 ? "99+" : unread}</div>
               )}

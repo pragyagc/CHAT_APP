@@ -16,7 +16,8 @@
     "openapi-typescript": "^6.7.2",
     "openapi-typescript-codegen": "^0.25.0",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "react-toastify": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

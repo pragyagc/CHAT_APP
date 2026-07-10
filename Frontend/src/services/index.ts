@@ -12,4 +12,5 @@ export type { CreateUserDto } from './models/CreateUserDto';
 export type { LoginRequest } from './models/LoginRequest';
 export type { RegisterRequest } from './models/RegisterRequest';
 
-export { ApiwebService } from './services/ApiwebService';
+export { ChatappWebapiService } from './services/ChatappWebapiService';
+export { ChatappWebapiService as ApiwebService } from './services/ChatappWebapiService';

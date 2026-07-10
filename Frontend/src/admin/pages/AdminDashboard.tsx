@@ -2,59 +2,84 @@ import { useEffect, useState } from "react";
 import { ApiwebService } from "../../services";
 import UsersPage from "./UsersPage";
 import AdminChat from "./AdminChat";
-import "../styles/admin.css";
 
-type Props = { onLogout: () => void };
+type Props = {
+  onLogout: () => void;
+};
 
 export default function AdminDashboard({ onLogout }: Props) {
-  const [dashboard, setDashboard] = useState<any>(null);
+  // Dashboard stats returned by GET /admin/dashboard
+  const [dashboard, setDashboard] = useState<any>();
+
+  // Controls which page is shown in the content area: "dashboard" | "users" | "messages"
   const [page, setPage] = useState("dashboard");
 
+  // Load dashboard stats on mount
   useEffect(() => {
-    ApiwebService.getAdminDashboard().then(setDashboard).catch(() => {});
+    loadDashboard();
   }, []);
 
-  const navItems = [
-    { key: "dashboard", icon: "📊", label: "Dashboard" },
-    { key: "users",     icon: "👥", label: "Users" },
-    { key: "messages",  icon: "💬", label: "Messages" },
-  ];
+  async function loadDashboard() {
+    // GET /admin/dashboard — returns { totalUsers, totalMessages, totalConversations }
+    const data = await ApiwebService.getAdminDashboard();
+    setDashboard(data);
+  }
 
   return (
     <div className="admin-layout">
-      {/* SIDEBAR */}
+
+      {/* ── LEFT SIDEBAR: branding + navigation ── */}
       <div className="admin-sidebar">
+
+        {/* Brand / logo area */}
         <div className="admin-sidebar-brand">
           <div className="admin-sidebar-brand-icon">🛡️</div>
           <div>
-            <span>ChatAdmin</span>
-            <small>Control Panel</small>
+            <span>Admin Panel</span>
+            <small>Chat App</small>
           </div>
         </div>
 
+        {/* Navigation items — each sets `page` to switch the content area */}
         <nav className="admin-nav">
-          {navItems.map((item) => (
-            <button
-              key={item.key}
-              className={`admin-nav-item${page === item.key ? " active" : ""}`}
-              onClick={() => setPage(item.key)}
-            >
-              <span className="admin-nav-item-icon">{item.icon}</span>
-              {item.label}
-            </button>
-          ))}
+          <button
+            className={`admin-nav-item${page === "dashboard" ? " active" : ""}`}
+            onClick={() => setPage("dashboard")}
+          >
+            <span className="admin-nav-item-icon">📊</span>
+            Dashboard
+          </button>
+
+          <button
+            className={`admin-nav-item${page === "users" ? " active" : ""}`}
+            onClick={() => setPage("users")}
+          >
+            <span className="admin-nav-item-icon">👥</span>
+            Users
+          </button>
+
+          <button
+            className={`admin-nav-item${page === "messages" ? " active" : ""}`}
+            onClick={() => setPage("messages")}
+          >
+            <span className="admin-nav-item-icon">💬</span>
+            Messages
+          </button>
         </nav>
 
+        {/* Logout button pinned to the bottom of the sidebar */}
         <div className="admin-sidebar-footer">
           <button className="admin-logout-btn" onClick={onLogout}>
-            <span className="admin-nav-item-icon">🚪</span>
+            <span className="admin-nav-item-icon">⏻</span>
             Logout
           </button>
         </div>
       </div>
 
-      {/* CONTENT */}
+      {/* ── RIGHT CONTENT AREA ── */}
       <div className="admin-content">
+
+        {/* Dashboard page: stat cards */}
         {page === "dashboard" && (
           <>
             <div className="admin-page-title">Dashboard</div>
@@ -77,15 +102,17 @@ export default function AdminDashboard({ onLogout }: Props) {
                 <div className="admin-stat-icon blue">🗂️</div>
                 <div className="admin-stat-info">
                   <strong>{dashboard?.totalConversations ?? "—"}</strong>
-                  <span>Conversations</span>
+                  <span>Total Conversations</span>
                 </div>
               </div>
             </div>
           </>
         )}
 
+        {/* Users page: table of all users with View/Block/Delete actions */}
         {page === "users" && <UsersPage />}
 
+        {/* Messages page: admin chat interface */}
         {page === "messages" && <AdminChat />}
       </div>
     </div>

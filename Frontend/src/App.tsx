@@ -6,6 +6,7 @@ import ConversationList from "./components/ConversationList";
 import UserList from "./components/UserList";
 import { ApiwebService } from "./services";
 import { jwtDecode } from "jwt-decode";
+import { toast } from "react-toastify";
 import { OpenAPI } from "./services/core/OpenAPI";
 import { connection, ensureConnection } from "./signalr/connection";
 
@@ -15,6 +16,8 @@ export default function App() {
   const [showRegister, setShowRegister] = useState(false);
 
   const [refresh, setRefresh] = useState(false);
+  const [prefetchedConversations, setPrefetchedConversations] = useState<any[] | null>(null);
+  const [conversations, setConversations] = useState<any[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<any>(null);
 
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -62,6 +65,8 @@ export default function App() {
         const me = await ApiwebService.getUsersMe();
         setCurrentUser(me);
         setCurrentUserId(me.id);
+        const convos = await ApiwebService.getConversations();
+        setConversations(convos ?? []);
         await ensureConnection();
         setIsLoggedIn(true);
       } catch (e) {
@@ -105,7 +110,8 @@ export default function App() {
   }, [isLoggedIn]);
 
   // ---------------- LOGIN ----------------
-  const handleLogin = async (email: string, password: string) => {
+const handleLogin = async (email: string, password: string) => {
+  try {
     const res = await ApiwebService.postAuthLogin({ email, password });
 
     const token = res?.token || res?.data?.token;
@@ -120,7 +126,12 @@ export default function App() {
     setIsLoggedIn(true);
 
     await ensureConnection();
-  };
+  } catch (error: any) {
+    toast.error(
+      error.response?.data || "Invalid email or password."
+    );
+  }
+};
 
   // ---------------- REGISTER ----------------
   const handleRegister = async (
@@ -192,6 +203,7 @@ export default function App() {
         <div className="sidebar-scroll">
           <ConversationList
             refresh={refresh}
+            prefetchedList={prefetchedConversations ?? conversations}
             unreadConversations={unreadConversations}
             selectedId={selectedConversation?.id}
             onSelectConversation={(c) => {
@@ -207,7 +219,8 @@ export default function App() {
 
           <UserList
             currentUserId={currentUserId}
-            onConversationCreated={() => setRefresh((p) => !p)}
+            conversations={conversations}
+            onConversationCreated={(convos) => setPrefetchedConversations(convos)}
             onSelectConversation={(c) => {
               selectedConversationRef.current = c;
               setSelectedConversation(c);

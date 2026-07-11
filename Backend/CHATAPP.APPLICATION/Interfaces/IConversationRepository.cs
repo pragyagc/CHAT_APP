@@ -8,7 +8,7 @@ public interface IConversationRepository
 {
     Task<Conversation> AddAsync(Conversation conversation);
 
-    Task<List<Conversation>> GetAllAsync();
+    Task<List<ConversationDto>> GetAllAsync(Guid currentUserId);
 
     Task<ConversationDetailsDto?> GetByIdAsync(Guid id);
 

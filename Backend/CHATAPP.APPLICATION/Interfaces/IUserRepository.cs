@@ -1,14 +1,15 @@
 ﻿using CHATAPP.DOMAIN.Entities;
+using CHATAPP.APPLICATION.DTOs.User;
 
 namespace CHATAPP.APPLICATION.Interfaces;
 
 public interface IUserRepository
 {
-    Task<User?> GetByIdAsync(Guid id);
+    Task<UserDto?> GetByIdAsync(Guid id);
 
-    Task<User?> GetByEmailAsync(string email);
+    Task<UserDto?> GetByEmailAsync(string email);
 
-    Task<List<User>> GetAllAsync();
+    Task<List<UserDto>> GetAllAsync();
 
     Task DeleteAsync(Guid id);
   

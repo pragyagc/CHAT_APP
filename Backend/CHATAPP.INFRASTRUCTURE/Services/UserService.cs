@@ -34,11 +34,13 @@ public class UserService : IUserService
     public async Task<UserDto?> GetByIdAsync(Guid id)
     {
         var user = await _userRepository.GetByIdAsync(id);
-
         if (user == null)
             return null;
-        var role = (await _userManager.GetRolesAsync(user))
-       .FirstOrDefault() ?? "";
+
+        var userEntity = await _userManager.FindByIdAsync(user.Id.ToString());
+        if (userEntity == null)
+            return null;
+        var role = (await _userManager.GetRolesAsync(userEntity)).FirstOrDefault() ?? "";
         return new UserDto
         {
             Id = user.Id,
@@ -55,14 +57,20 @@ public class UserService : IUserService
 
         if (user == null)
             return null;
-        var role = (await _userManager.GetRolesAsync(user))
-        .FirstOrDefault() ?? "";
+
+        var userEntity = await _userManager.FindByIdAsync(user.Id.ToString());
+
+        if (userEntity == null)
+            return null;
+
+        var role = (await _userManager.GetRolesAsync(userEntity))
+            .FirstOrDefault() ?? "";
 
         return new UserProfileDto
         {
             Id = user.Id,
-            UserName = user.UserName!,
-            Email = user.Email!,
+            UserName = user.UserName,
+            Email = user.Email,
             Role = role
         };
     }

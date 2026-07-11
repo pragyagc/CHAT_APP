@@ -2,6 +2,7 @@
 using CHATAPP.DOMAIN.Entities;
 using CHATAPP.INFRASTRUCTURE.Data;
 using Microsoft.EntityFrameworkCore;
+using CHATAPP.APPLICATION.DTOs.User;
 
 namespace CHATAPP.INFRASTRUCTURE.Repositories;
 
@@ -14,23 +15,45 @@ public class UserRepository : IUserRepository
         _db = db;
     }
 
-    public async Task<List<User>> GetAllAsync()
+    public async Task<List<UserDto?>> GetAllAsync()
     {
-        return await _db.Users
+        var getall = await _db.Users
             .Where(x => !x.IsDeleted)
-            .ToListAsync();
+             .Select(x => new UserDto
+             {
+                 Id = x.Id,
+                 UserName = x.UserName!,
+                 Email = x.Email!
+             }).ToListAsync();
+        return getall;
     }
 
-    public async Task<User?> GetByIdAsync(Guid id)
+    public async Task<UserDto?> GetByIdAsync(Guid id)
     {
-        return await _db.Users
-            .FirstOrDefaultAsync(x => x.Id == id&&!x.IsDeleted);
+        var getbyid = await _db.Users
+        .Where(x => x.Id == id && !x.IsDeleted)
+        .Select(x => new UserDto
+        {
+            Id = x.Id,
+            UserName = x.UserName!,
+            Email = x.Email!
+        })
+        .FirstOrDefaultAsync();
+        return getbyid;
     }
 
-    public async Task<User?> GetByEmailAsync(string email)
+    public async Task<UserDto?> GetByEmailAsync(string email)
     {
-        return await _db.Users
-            .FirstOrDefaultAsync(x => x.Email == email);
+        var get = await _db.Users
+        .Where(x => x.Email == email)
+        .Select(x => new UserDto
+        {
+            Id = x.Id,
+            UserName = x.UserName!,
+            Email = x.Email!
+        })
+        .FirstOrDefaultAsync();
+        return get;
     }
 
     public async Task DeleteAsync(Guid id)

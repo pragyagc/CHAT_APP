@@ -59,18 +59,51 @@ public class ConversationRepository : IConversationRepository
         return conversation;
     }
 
-    public async Task<List<Conversation>> GetAllAsync()
+    public async Task<List<ConversationDto>> GetAllAsync(Guid currentUserId)
     {
-        var conversation= await _db.Conversations
-            .Include(c => c.Participants)
-                .ThenInclude(cp => cp.User)
-            .Include(c => c.Messages)
-            .OrderByDescending(c =>
-                c.Messages.Any()
-                    ? c.Messages.Max(m => m.SentAt)
-                    : c.CreatedAt)
+      var getall= await _db.Conversations
+            .Where(c => c.Participants.Any(p => p.UserId == currentUserId))
+            .Select(c => new ConversationDto
+            {
+                Id = c.Id,
+
+                OtherUserId = c.Participants
+                    .Where(p => p.UserId != currentUserId)
+                    .Select(p => p.User.Id)
+                    .FirstOrDefault(),
+
+                OtherUserName = c.Participants
+                    .Where(p => p.UserId != currentUserId)
+                    .Select(p => p.User.UserName!)
+                    .FirstOrDefault(),
+
+                OtherUserEmail = c.Participants
+                    .Where(p => p.UserId != currentUserId)
+                    .Select(p => p.User.Email!)
+                    .FirstOrDefault(),
+
+                LastMessage = c.Messages
+                    .OrderByDescending(m => m.SentAt)
+                    .Select(m => m.Text)
+                    .FirstOrDefault() ?? "",
+
+                LastMessageTime = c.Messages
+                    .OrderByDescending(m => m.SentAt)
+                    .Select(m => (DateTime?)m.SentAt)
+                    .FirstOrDefault(),
+
+                IsReadOnly = c.IsReadOnly,
+
+                IsAdminConversation = c.IsAdminConversation,
+
+                UnreadCount = c.Messages.Count(m =>
+                    m.SenderId != currentUserId &&
+                    !m.IsSeen)
+            })
+            .OrderByDescending(c => c.LastMessageTime)
             .ToListAsync();
-        return conversation;
+
+        return getall;
     }
 
     public async Task<bool> IsParticipantAsync(Guid conversationId, Guid userId)
@@ -82,7 +115,7 @@ public class ConversationRepository : IConversationRepository
 
         return isparticipant;
     }
-
+    //returning a Conversation entity, and the service later needs its related data.
     public async Task<Conversation?> GetBetweenUsersAsync(Guid user1Id, Guid user2Id)
     {
        var getbetween=  await _db.Conversations

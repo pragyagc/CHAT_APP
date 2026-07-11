@@ -2,6 +2,7 @@
 using CHATAPP.DOMAIN.Entities;
 using CHATAPP.INFRASTRUCTURE.Data;
 using Microsoft.EntityFrameworkCore;
+using CHATAPP.APPLICATION.DTOs.Message;
 
 namespace CHATAPP.INFRASTRUCTURE.Repositories;
 
@@ -19,20 +20,41 @@ public class MessageRepository : IMessageRepository
         await _db.Messages.AddAsync(message);
     }
 
-    public async Task<List<Message>> GetByConversationIdAsync(Guid conversationId)
+    public async Task<List<MessageDto>> GetByConversationIdAsync(Guid conversationId)
     {
         return await _db.Messages
             .Where(m => m.ConversationId == conversationId)
-            .OrderBy(m => m.SentAt)           // oldest → newest
-            .Include(m => m.Sender)           // sender information
+            .OrderBy(m => m.SentAt)
+            .Select(m => new MessageDto
+            {
+                Id = m.Id,
+                ConversationId = m.ConversationId,
+                SenderId = m.SenderId,
+                Text = m.Text,
+                CreatedAt = m.CreatedAt,
+                SentAt = m.SentAt,
+                IsSeen = m.IsSeen,
+                SeenAt = m.SeenAt
+            })
             .ToListAsync();
     }
 
-    public async Task<Message?> GetByIdAsync(Guid id)
+    public async Task<MessageDto?> GetByIdAsync(Guid id)
     {
         return await _db.Messages
-            .Include(m => m.Sender)
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .Where(m => m.Id == id)
+            .Select(m => new MessageDto
+            {
+                Id = m.Id,
+                ConversationId = m.ConversationId,
+                SenderId = m.SenderId,
+                Text = m.Text,
+                CreatedAt = m.CreatedAt,
+                SentAt = m.SentAt,
+                IsSeen = m.IsSeen,
+                SeenAt = m.SeenAt
+            })
+            .FirstOrDefaultAsync();
     }
 
     public async Task SaveAsync()

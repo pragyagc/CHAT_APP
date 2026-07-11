@@ -78,9 +78,8 @@ public class MessageService : IMessageService
         var messages =
             await _repository.GetByConversationIdAsync(conversationId);
 
-        return messages
-            .Select(ToDto)
-            .ToList();
+        return messages;
+           
     }
 
     public async Task<MessageDto?> GetByIdAsync(Guid id)
@@ -91,7 +90,7 @@ public class MessageService : IMessageService
         if (message == null)
             return null;
 
-        return ToDto(message);
+        return message;
     }
 
     public async Task MarkAsSeenAsync(Guid messageId)

@@ -15,4 +15,6 @@ public class MessageDto
     public bool IsSeen { get; set; }
 
     public DateTime? SeenAt { get; set; }
+    public DateTime SentAt { get; set; }
+
 }

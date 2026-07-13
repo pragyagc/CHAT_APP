@@ -7,10 +7,10 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
+export type { ChangeRoleDto } from './models/ChangeRoleDto';
 export type { CreateMessageDto } from './models/CreateMessageDto';
 export type { CreateUserDto } from './models/CreateUserDto';
 export type { LoginRequest } from './models/LoginRequest';
 export type { RegisterRequest } from './models/RegisterRequest';
 
-export { ChatappWebapiService } from './services/ChatappWebapiService';
-export { ChatappWebapiService as ApiwebService } from './services/ChatappWebapiService';
+export { ApiwebService } from './services/ApiwebService';

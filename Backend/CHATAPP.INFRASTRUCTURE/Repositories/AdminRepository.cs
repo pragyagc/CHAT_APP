@@ -65,9 +65,11 @@ public class AdminRepository : IAdminRepository
 
         foreach (var user in users)
         {
-            // Skip admins
-            if (await _userManager.IsInRoleAsync(user, "Admin"))
-                continue;
+            //// Skip admins
+            //if (await _userManager.IsInRoleAsync(user, "Admin"))
+            //    continue;
+            var roles = await _userManager.GetRolesAsync(user);
+
 
             result.Add(new UserInfoDto
             {
@@ -77,7 +79,7 @@ public class AdminRepository : IAdminRepository
                 IsBlocked = user.IsBlocked,
                 IsDeleted = user.IsDeleted,
                 CreatedAt = user.CreatedAt,
-                Role = "User"
+                Role = roles.FirstOrDefault() ?? string.Empty
             });
         }
         var returnData = result
@@ -162,5 +164,37 @@ public class AdminRepository : IAdminRepository
             throw new Exception("Role does not exist.");
 
         await _userManager.AddToRoleAsync(user, dto.Role);
+    }
+    public async Task UpdateUserRoleAsync(ChangeRoleDto dto)
+    {
+        var user = await _userManager.FindByIdAsync(dto.UserId.ToString());
+
+        if (user == null)
+            throw new Exception("User not found.");
+
+        var roles = await _userManager.GetRolesAsync(user);
+
+        if (roles.Any())
+            await _userManager.RemoveFromRolesAsync(user, roles);
+
+        var result = await _userManager.AddToRoleAsync(user, dto.Role);
+
+        if (!result.Succeeded)
+            throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+
+        bool isAdmin = dto.Role == "Admin";
+
+        var conversations = await _context.Conversations
+            .Include(c => c.Participants)
+            .Where(c => c.Participants.Any(p => p.UserId == user.Id))
+            .ToListAsync();
+
+        foreach (var conversation in conversations)
+        {
+            conversation.IsAdminConversation = isAdmin;
+            conversation.IsReadOnly = isAdmin;
+        }
+
+        await _context.SaveChangesAsync();
     }
 }

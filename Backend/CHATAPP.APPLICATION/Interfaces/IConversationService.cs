@@ -8,7 +8,7 @@ public interface IConversationService
     Task<Conversation> CreateAsync(Guid userId, Guid otherUserId);
     Task<List<ConversationDto>> GetAllAsync(Guid currentuserId);
 
-    Task<ConversationDetailsDto?> GetByIdAsync(Guid id);
+    Task<ConversationDetailsDto?> GetByIdAsync(Guid id, Guid currentUserId, bool isAdmin);
 
     Task<bool> IsParticipantAsync(Guid conversationId, Guid userId);
     Task<List<Guid>> GetParticipantIdsAsync(Guid conversationId);

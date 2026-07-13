@@ -53,6 +53,9 @@ builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 //add singleton service for online user tracking
 builder.Services.AddSingleton<IOnlineUserService, OnlineUserService>();
+builder.Services.AddHttpContextAccessor();
+
+
 
 #endregion
 

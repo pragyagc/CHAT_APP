@@ -50,4 +50,8 @@ public class AdminService : IAdminService
     {
         await _adminRepository.CreateUserAsync(dto);
     }
+    public async Task UpdateUserRoleAsync(ChangeRoleDto dto)
+    {
+        await _adminRepository.UpdateUserRoleAsync(dto);
+    }
 }

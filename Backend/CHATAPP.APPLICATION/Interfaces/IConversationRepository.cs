@@ -10,7 +10,8 @@ public interface IConversationRepository
 
     Task<List<ConversationDto>> GetAllAsync(Guid currentUserId);
 
-    Task<ConversationDetailsDto?> GetByIdAsync(Guid id);
+    Task<ConversationDetailsDto?> GetByIdAsync(Guid id, Guid currentUserId,
+    bool isAdmin);
 
     Task<bool> IsParticipantAsync(Guid conversationId, Guid userId);
 

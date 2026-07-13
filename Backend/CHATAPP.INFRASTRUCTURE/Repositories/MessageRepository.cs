@@ -61,4 +61,15 @@ public class MessageRepository : IMessageRepository
     {
         await _db.SaveChangesAsync();
     }
+    public async Task<List<Message>> GetUnreadMessagesAsync(
+    Guid conversationId,
+    Guid userId)
+    {
+        return await _db.Messages
+            .Where(m =>
+                m.ConversationId == conversationId &&
+                m.SenderId != userId &&
+                !m.IsSeen)
+            .ToListAsync();
+    }
 }

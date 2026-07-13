@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { ApiwebService } from "../../services";
 import UsersPage from "./UsersPage";
 import AdminChat from "./AdminChat";
+import { jwtDecode } from "jwt-decode";
 
 type Props = {
   onLogout: () => void;
 };
+
 
 export default function AdminDashboard({ onLogout }: Props) {
   // Dashboard stats returned by GET /admin/dashboard
@@ -13,11 +15,27 @@ export default function AdminDashboard({ onLogout }: Props) {
 
   // Controls which page is shown in the content area: "dashboard" | "users" | "messages"
   const [page, setPage] = useState("dashboard");
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   // Load dashboard stats on mount
-  useEffect(() => {
-    loadDashboard();
-  }, []);
+ useEffect(() => {
+  loadDashboard();
+
+  const token = localStorage.getItem("adminToken");
+
+  if (token) {
+    const decoded: any = jwtDecode(token);
+
+    setCurrentUser({
+      userName:
+        decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"],
+      email:
+        decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
+      role:
+        decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"],
+    });
+  }
+}, []);
 
   async function loadDashboard() {
     // GET /admin/dashboard — returns { totalUsers, totalMessages, totalConversations }
@@ -77,10 +95,48 @@ export default function AdminDashboard({ onLogout }: Props) {
       </div>
 
       {/* ── RIGHT CONTENT AREA ── */}
-      <div className="admin-content">
+     <div className="admin-content">
 
-        {/* Dashboard page: stat cards */}
-        {page === "dashboard" && (
+  {currentUser && (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "20px",
+        padding: "16px 20px",
+        background: "#fff",
+        borderRadius: "12px",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+      }}
+    >
+      <div>
+        <h2 style={{ margin: 0 }}>Administrator Dashboard</h2>
+        <div style={{ color: "#666", marginTop: 4 }}>
+          Logged in as <strong>{currentUser.userName}</strong>
+        </div>
+        <div style={{ color: "#999", fontSize: "14px" }}>
+          {currentUser.email}
+        </div>
+      </div>
+
+      <span
+        style={{
+          background: "#4f46e5",
+          color: "#fff",
+          padding: "6px 14px",
+          borderRadius: "999px",
+          fontWeight: 600,
+        }}
+      >
+        {currentUser.role}
+      </span>
+    </div>
+  )}
+
+  {/* Dashboard page: stat cards */}
+  {page === "dashboard" && (
+      
           <>
             <div className="admin-page-title">Dashboard</div>
             <div className="admin-stats-grid">

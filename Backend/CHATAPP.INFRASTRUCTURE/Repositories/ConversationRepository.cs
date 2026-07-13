@@ -22,10 +22,18 @@ public class ConversationRepository : IConversationRepository
         return conversation;
     }
 
-    public async Task<ConversationDetailsDto?> GetByIdAsync(Guid id)
+    public async Task<ConversationDetailsDto?> GetByIdAsync(
+    Guid id,
+    Guid currentUserId,
+    bool isAdmin)
     {
-        var conversation =await _db.Conversations
+        var conversation = await _db.Conversations
             .Where(c => c.Id == id)
+            .Where(c =>
+                    isAdmin ||
+                    c.IsAdminConversation ||
+                    c.Participants.Any(p => p.UserId == currentUserId)
+)
             .Select(c => new ConversationDetailsDto
             {
                 Id = c.Id,
@@ -49,13 +57,12 @@ public class ConversationRepository : IConversationRepository
                         ConversationId = m.ConversationId,
                         SenderId = m.SenderId,
                         Text = m.Text,
-                        CreatedAt = m.CreatedAt,
-                        IsSeen = m.IsSeen,
-                        SeenAt = m.SeenAt
+                        CreatedAt = m.CreatedAt
                     })
                     .ToList()
             })
             .FirstOrDefaultAsync();
+
         return conversation;
     }
 
@@ -73,7 +80,7 @@ public class ConversationRepository : IConversationRepository
                     .FirstOrDefault(),
 
                 OtherUserName = c.Participants
-                    .Where(p => p.UserId != currentUserId)
+                  .Where(p => p.UserId != currentUserId)
                     .Select(p => p.User.UserName!)
                     .FirstOrDefault(),
 

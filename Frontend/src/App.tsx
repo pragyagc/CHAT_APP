@@ -23,11 +23,14 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [currentUserId, setCurrentUserId] = useState("");
 
+
+
   const [unreadConversations, setUnreadConversations] =
     useState<Map<string, number>>(new Map());
-
+ 
   const selectedConversationRef = useRef<any>(null);
   const currentUserIdRef = useRef("");
+  
 
   useEffect(() => {
     selectedConversationRef.current = selectedConversation;
@@ -123,9 +126,10 @@ const handleLogin = async (email: string, password: string) => {
     const me = await ApiwebService.getUsersMe();
     setCurrentUser(me);
     setCurrentUserId(me.id);
-    setIsLoggedIn(true);
-
+    const convos= await ApiwebService.getConversations();
+    setConversations(convos ?? []);
     await ensureConnection();
+    setIsLoggedIn(true);
   } catch (error: any) {
     toast.error(
       error.response?.data || "Invalid email or password."
@@ -207,6 +211,7 @@ const handleLogin = async (email: string, password: string) => {
             unreadConversations={unreadConversations}
             selectedId={selectedConversation?.id}
             onSelectConversation={(c) => {
+               console.log("Selected conversation", c);
               selectedConversationRef.current = c;
               setSelectedConversation(c);
               setUnreadConversations((prev) => {
@@ -228,12 +233,13 @@ const handleLogin = async (email: string, password: string) => {
           />
         </div>
       </div>
-
+            
       {/* CHAT */}
       {selectedConversation ? (
         <ChatWindow
           conversation={selectedConversation}
           currentUserId={currentUserId}
+          currentUser={currentUser}
         />
       ) : (
         <div className="empty-chat">

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { ApiwebService } from "../../services";
 import ConfirmModal from "../components/ConfirmModal";
 
@@ -7,9 +8,24 @@ type Props = { userId: string; goBack: () => void };
 export default function UserDetails({ userId, goBack }: Props) {
   const [user, setUser] = useState<any>(null);
   const [confirm, setConfirm] = useState<{ message: string; action: () => Promise<any> } | null>(null);
+  const [roleLoading, setRoleLoading] = useState(false);
 
   function ask(message: string, action: () => Promise<any>) {
     setConfirm({ message, action });
+  }
+
+  async function changeRole(role: string) {
+    try {
+      setRoleLoading(true);
+      await ApiwebService.putAdminUsersRole({ userId, role });
+      toast.success(`Role updated to ${role}`);
+      await loadUser();
+    } catch (err) {
+      console.error("Failed to change role", err);
+      toast.error("Failed to update user role.");
+    } finally {
+      setRoleLoading(false);
+    }
   }
 
   // Load user details on mount
@@ -85,6 +101,24 @@ export default function UserDetails({ userId, goBack }: Props) {
             </button>
           ) : (
             <>
+              {user.role === "Admin" ? (
+                <button
+                  className="admin-btn admin-btn-ghost"
+                  disabled={roleLoading}
+                  onClick={() => ask("Demote this user to regular User?", () => changeRole("User"))}
+                >
+                  ↩️ Demote to User
+                </button>
+              ) : (
+                <button
+                  className="admin-btn admin-btn-success"
+                  disabled={roleLoading}
+                  onClick={() => ask("Promote this user to Admin? This will mark their conversation as administrator-only.", () => changeRole("Admin"))}
+                >
+                  ⭐ Make Admin
+                </button>
+              )}
+
               {user.isBlocked ? (
                 <button
                   className="admin-btn admin-btn-success"

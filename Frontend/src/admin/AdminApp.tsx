@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 export default function AdminApp() {
   // Tracks whether the admin is authenticated
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
 
   /**
    * On mount, check if an admin token is already saved in localStorage.

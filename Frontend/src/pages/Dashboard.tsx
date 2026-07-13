@@ -76,7 +76,8 @@ export default function Dashboard() {
           <hr />
 
           <UserList
-            currentUserId={user.id}
+            currentUserId={user?.id}
+            conversations={user?.conversations || []}
             onConversationCreated={() =>
               setRefreshConversations(prev => !prev)
             }
@@ -86,8 +87,9 @@ export default function Dashboard() {
           <hr />
 
           <ConversationList
-            refresh={refreshConversations}
-            onSelectConversation={setSelectedConversation}
+            key={refreshConversations ? "refresh" : "default"}
+            conversations={user?.conversations || []}
+            onSelect={setSelectedConversation}
           />
 
         </div>
@@ -98,6 +100,8 @@ export default function Dashboard() {
 
             <ChatWindow
               conversation={selectedConversation}
+              currentUserId={user?.id}
+              currentUser={user}
             />
 
           ) : (

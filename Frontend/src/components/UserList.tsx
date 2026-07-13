@@ -76,7 +76,7 @@ export default function UserList({
 
           <div className="user-info">
             <strong>{user.userName}</strong>
-            <span>{user.email}</span>
+            {/* <span>{user.email}</span> */}
           </div>
 
           {/* Chat button — stopPropagation prevents the row's onClick from firing twice */}

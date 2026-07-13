@@ -65,12 +65,17 @@ public class ConversationService : IConversationService
         var otherIsAdmin =
             await _userManager.IsInRoleAsync(otherUser, "Admin");
 
-        // User -> Admin ❌
-        if (!currentIsAdmin && otherIsAdmin)
-            throw new UnauthorizedAccessException(
-                "Users cannot start conversations with administrators.");
+        //// User -> Admin ❌
+        //if (!currentIsAdmin && otherIsAdmin)
+        //    throw new UnauthorizedAccessException(
+        //        "Users cannot start conversations with administrators.");
 
-        // Admin -> Admin ❌
+        //// Admin -> Admin ❌
+        //if (currentIsAdmin && otherIsAdmin)
+        //    throw new UnauthorizedAccessException(
+        //        "Administrators cannot chat with each other.");
+
+        // Only block Admin -> Admin
         if (currentIsAdmin && otherIsAdmin)
             throw new UnauthorizedAccessException(
                 "Administrators cannot chat with each other.");
@@ -81,10 +86,10 @@ public class ConversationService : IConversationService
             CreatedAt = DateTime.UtcNow,
 
             // Admin conversations are read-only
-            IsReadOnly = currentIsAdmin,
+            IsReadOnly = currentIsAdmin||otherIsAdmin,
 
             // Mark admin conversations
-            IsAdminConversation = currentIsAdmin
+            IsAdminConversation = currentIsAdmin || otherIsAdmin
         };
 
         conversation.Participants.Add(new ConversationParticipant
@@ -157,9 +162,9 @@ public class ConversationService : IConversationService
             .ToList();
     }
 
-    public async Task<ConversationDetailsDto?> GetByIdAsync(Guid id)
+    public async Task<ConversationDetailsDto?> GetByIdAsync(Guid id,Guid currentUserId,bool isAdmin)
     {
-        return await _repository.GetByIdAsync(id);
+        return await _repository.GetByIdAsync(id,currentUserId,isAdmin);
     }
 
     public async Task<bool> IsParticipantAsync(

@@ -10,5 +10,6 @@ public interface IMessageRepository
     //it should not returnDTO else efcore is not tracking this for seen
     Task<MessageDto?> GetByIdAsync(Guid id);
     Task SaveAsync();
+    Task<List<Message>> GetUnreadMessagesAsync(Guid conversationId, Guid userId);
 
 }

@@ -1,13 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { ApiwebService } from "../services";
+import {ApiwebService} from "../services";
 import { connection, ensureConnection } from "../signalr/connection";
+
+
+type CurrentUser = {
+  id: string;
+  userName: string;
+  email: string;
+  role: string;
+};
 
 type Props = {
   conversation: any;  // The full conversation object (id, otherUserId, otherUserName, isAdminConversation, etc.)
   currentUserId: string;
+  currentUser: CurrentUser;
 };
 
-export default function ChatWindow({ conversation, currentUserId }: Props) {
+export default function ChatWindow({ conversation, currentUserId, currentUser }: Props) {
   // List of message objects loaded from the API and appended via SignalR
   const [messages, setMessages] = useState<any[]>([]);
 
@@ -29,9 +38,16 @@ export default function ChatWindow({ conversation, currentUserId }: Props) {
   // Tracks whether we've already sent a Typing event (avoids spamming the hub on every keystroke)
   const isTypingRef = useRef(false);
 
-  // Admin conversations are read-only for the regular user — hide the input
-  const canSend = !conversation?.isAdminConversation;
+  console.log("Conversation received:", conversation);
 
+  const isAdmin = currentUser?.role === "Admin";
+  const isAdminConversation = conversation?.isAdminConversation;
+
+  const canSend = !conversation?.isReadOnly || isAdmin;
+
+  console.log("conversation.isReadOnly", conversation?.isReadOnly);
+  console.log("isAdmin", isAdmin);
+  console.log("canSend", canSend);
   // Ref to the scrollable messages container — used to scroll to bottom programmatically
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
@@ -273,6 +289,11 @@ export default function ChatWindow({ conversation, currentUserId }: Props) {
             <span className={isOnline ? "online" : "offline"}>
               {isOnline ? "Online" : "Offline"}
             </span>
+            {isAdminConversation && (
+              <span className="chat-admin-badge">
+                Administrator conversation
+              </span>
+            )}
           </div>
         </div>
         <div className="chat-header-actions">
@@ -398,8 +419,8 @@ export default function ChatWindow({ conversation, currentUserId }: Props) {
       ) : (
         
         <div className="admin-notice">
-          This is an admin conversation. You cannot reply.
-        </div>
+    You cannot reply to this conversation because it is an administrator conversation.
+</div>
       )}
     </div>
   );

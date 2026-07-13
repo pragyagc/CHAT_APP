@@ -30,6 +30,7 @@ export default function ChatPage() {
         {/* START NEW CHAT */}
         <UserList
           currentUserId={currentUserId}
+          conversations={[]}
           onConversationCreated={() => setRefresh(!refresh)}
           onSelectConversation={setSelectedConversation}
         />
@@ -39,7 +40,11 @@ export default function ChatPage() {
       {/* CHAT AREA */}
       <div style={{ flex: 1 }}>
         {selectedConversation ? (
-          <ChatWindow conversation={selectedConversation} />
+          <ChatWindow
+            conversation={selectedConversation}
+            currentUserId={currentUserId}
+            currentUser={decoded}
+          />
         ) : (
           <div style={{ padding: 20 }}>
             Select a conversation

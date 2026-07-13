@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ApiwebService } from "../services";
+import { toast } from "react-toastify";
 
 type Props = {
   refresh: boolean;
@@ -119,8 +120,13 @@ export default function ConversationList({
         </div>
       ) : (
         conversations.map((c) => {
+
+         
           // Get the unread count for this conversation (0 if not in the map)
-          const unread = unreadConversations.get(c.id) ?? 0;
+          const unread =
+                    unreadConversations.get(c.id) ??
+                    c.unreadCount ??
+                    0;
 
           // Highlight this item if it's the currently open conversation
           const isActive = c.id === selectedId;
@@ -129,7 +135,20 @@ export default function ConversationList({
             <div
               key={c.id}
               className={`conv-item${isActive ? " active" : ""}`}
-              onClick={() => onSelectConversation(c)}
+              // onClick={() => onSelectConversation(c)}
+
+              // onClick={() => {
+              //   if (c.isAdminConversation && c.isReadOnly) {
+              //     toast.info("This user is now an administrator. You cannot open this conversation.");
+              //     return;
+              //   }
+
+              //   onSelectConversation(c);
+              // }}
+
+              onClick={() => {
+    onSelectConversation(c);
+}}
             >
               {/* Colored avatar circle with the first letter of the other user's name */}
               <div
@@ -144,6 +163,9 @@ export default function ConversationList({
                 <div className={`conv-name${unread > 0 ? " unread" : ""}`}>
                   {c.otherUserName}
                 </div>
+                {c.isAdminConversation && (
+                  <div className="conv-subtitle">Administrator conversation</div>
+                )}
               </div>
 
               {/* Unread count badge — only shown when unread > 0, caps at "99+" */}

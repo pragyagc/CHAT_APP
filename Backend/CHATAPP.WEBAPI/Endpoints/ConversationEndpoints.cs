@@ -33,10 +33,21 @@ public static class ConversationEndpoints
             var id = Guid.Parse(
                 user.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            return Results.Ok(
-                await service.CreateAsync(
-                    id,
-                    otherUserId));
+            try
+            {
+                var conversation = await service.CreateAsync(id, otherUserId);
+                return Results.Ok(conversation);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Results.Problem(
+            detail: ex.Message,
+            statusCode: StatusCodes.Status403Forbidden);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.BadRequest(ex.Message);
+            }
         });
     }
 }

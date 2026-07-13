@@ -106,5 +106,25 @@ public static class AdminEndpoints
                 Message = "User created successfully."
             });
         });
+
+        admin.MapPut("/users/role",
+        async (
+            ChangeRoleDto dto,
+            IAdminService service) =>
+        {
+            try
+            {
+                await service.UpdateUserRoleAsync(dto);
+
+                return Results.Ok(new
+                {
+                    Message = "User role updated successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest(ex.Message);
+            }
+        });
     }
 }

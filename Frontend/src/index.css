@@ -563,6 +563,22 @@ body {
   background: #fafafa;
 }
 
+.conv-subtitle {
+  margin-top: 3px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.chat-admin-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  color: #ffffff;
+  background: #6b46c1;
+}
+
 /* ── LOADING ── */
 .app-loading {
   display: flex;

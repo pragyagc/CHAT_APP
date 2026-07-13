@@ -17,4 +17,6 @@ public interface IAdminRepository
     Task RestoreUserAsync(Guid userId);
 
     Task CreateUserAsync(CreateUserDto dto);
+    Task UpdateUserRoleAsync(ChangeRoleDto dto);
+
 }

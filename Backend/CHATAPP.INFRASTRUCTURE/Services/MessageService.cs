@@ -21,13 +21,29 @@ public class MessageService : IMessageService
         _userManager = userManager;
     }
 
+    private async Task<bool> IsAdminAsync(Guid userId)
+    {
+        var user = await _userManager.FindByIdAsync(
+            userId.ToString()
+        );
+
+        if (user == null)
+            return false;
+
+        return await _userManager.IsInRoleAsync(
+            user,
+            "Admin"
+        );
+    }
+
     public async Task<MessageDto> SendAsync(
         Guid senderId,
         Guid conversationId,
         string text)
     {
+        var userisAdmin = await IsAdminAsync(senderId);
         var conversation =
-            await _conversationRepository.GetByIdAsync(conversationId);
+            await _conversationRepository.GetByIdAsync(conversationId,senderId,userisAdmin);
 
         Console.WriteLine("================================");
         Console.WriteLine($"ConversationId: {conversationId}");
@@ -39,20 +55,10 @@ public class MessageService : IMessageService
         if (conversation == null)
             throw new Exception("Conversation not found.");
 
-        if (conversation.IsReadOnly)
+        if (conversation.IsReadOnly && !userisAdmin)
         {
-            var sender =
-                await _userManager.FindByIdAsync(senderId.ToString());
-
-            if (sender == null)
-                throw new Exception("User not found.");
-
-            var isAdmin =
-                await _userManager.IsInRoleAsync(sender, "Admin");
-
-            if (!isAdmin)
-                throw new UnauthorizedAccessException(
-                    "You cannot reply to this conversation.");
+            throw new UnauthorizedAccessException(
+                "You cannot reply to this conversation.");
         }
 
         var message = new Message
@@ -112,7 +118,7 @@ public class MessageService : IMessageService
         Guid userId)
     {
         var messages =
-            await _repository.GetByConversationIdAsync(conversationId);
+            await _repository.GetUnreadMessagesAsync(conversationId,userId);
 
         var unseenMessages = messages.Where(m => m.SenderId != userId && !m.IsSeen)
             .ToList();

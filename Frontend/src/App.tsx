@@ -1,3 +1,4 @@
+// 
 import { useEffect, useRef, useState } from "react";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -240,6 +241,19 @@ const handleLogin = async (email: string, password: string) => {
           conversation={selectedConversation}
           currentUserId={currentUserId}
           currentUser={currentUser}
+          onConversationUpdated={async () => {
+            const updated = await ApiwebService.getConversations();
+
+            setConversations(updated);
+            setPrefetchedConversations(updated);
+
+            const selected = updated.find((c: any) => c.id === selectedConversationRef.current?.id);
+
+            if (selected) {
+              selectedConversationRef.current = selected;
+              setSelectedConversation(selected);
+            }
+          }}
         />
       ) : (
         <div className="empty-chat">

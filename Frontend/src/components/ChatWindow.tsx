@@ -14,9 +14,10 @@ type Props = {
   conversation: any;  // The full conversation object (id, otherUserId, otherUserName, isAdminConversation, etc.)
   currentUserId: string;
   currentUser: CurrentUser;
+   onConversationUpdated?: () => void;
 };
 
-export default function ChatWindow({ conversation, currentUserId, currentUser }: Props) {
+export default function ChatWindow({ conversation, currentUserId, currentUser, onConversationUpdated }: Props) {
   // List of message objects loaded from the API and appended via SignalR
   const [messages, setMessages] = useState<any[]>([]);
 
@@ -128,6 +129,9 @@ export default function ChatWindow({ conversation, currentUserId, currentUser }:
   async function sendMessage() {
     if (!canSend || !text.trim()) return;
     await connection.invoke("SendMessage", conversation.id, text);
+    const updated = await ApiwebService.getConversations();
+
+    onConversationUpdated?.();
     setText(""); // Clear input after sending
     isTabActiveRef.current = true; // Treat send as "tab is active"
   }

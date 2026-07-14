@@ -1,0 +1,17 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\CHATAPP.APPLICATION",
+    "\\CHATAPP.APPLICATION\\DTOs",
+    "\\CHATAPP.APPLICATION\\DTOs\\Admin",
+    "\\CHATAPP.APPLICATION\\DTOs\\User",
+    "\\CHATAPP.APPLICATION\\Interfaces",
+    "\\CHATAPP.INFRASTRUCTURE",
+    "\\CHATAPP.INFRASTRUCTURE\\Services",
+    "\\CHATAPP.WEBAPI",
+    "\\CHATAPP.WEBAPI\\Endpoints",
+    "\\CHATAPP.WEBAPI\\Hubs"
+  ],
+  "SelectedNode": "\\CHATAPP.WEBAPI\\Program.cs",
+  "PreviewInSolutionExplorer": false
+}

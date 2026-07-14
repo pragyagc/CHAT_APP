@@ -1,0 +1,455 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\CHAT_APP\\Backend\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{9CEF99EE-DAC3-0C8D-0E5C-9C03AD73751A}|CHATAPP.WEBAPI\\CHATAPP.WEBAPI.csproj|e:\\chat_app\\backend\\chatapp.webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9CEF99EE-DAC3-0C8D-0E5C-9C03AD73751A}|CHATAPP.WEBAPI\\CHATAPP.WEBAPI.csproj|solutionrelative:chatapp.webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9CEF99EE-DAC3-0C8D-0E5C-9C03AD73751A}|CHATAPP.WEBAPI\\CHATAPP.WEBAPI.csproj|e:\\chat_app\\backend\\chatapp.webapi\\hubs\\chathub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9CEF99EE-DAC3-0C8D-0E5C-9C03AD73751A}|CHATAPP.WEBAPI\\CHATAPP.WEBAPI.csproj|solutionrelative:chatapp.webapi\\hubs\\chathub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ED8CABDF-E647-1664-9FA4-F26D3CDB13F9}|CHATAPP.INFRASTRUCTURE\\CHATAPP.INFRASTRUCTURE.csproj|e:\\chat_app\\backend\\chatapp.infrastructure\\services\\conversationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ED8CABDF-E647-1664-9FA4-F26D3CDB13F9}|CHATAPP.INFRASTRUCTURE\\CHATAPP.INFRASTRUCTURE.csproj|solutionrelative:chatapp.infrastructure\\services\\conversationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ED8CABDF-E647-1664-9FA4-F26D3CDB13F9}|CHATAPP.INFRASTRUCTURE\\CHATAPP.INFRASTRUCTURE.csproj|e:\\chat_app\\backend\\chatapp.infrastructure\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ED8CABDF-E647-1664-9FA4-F26D3CDB13F9}|CHATAPP.INFRASTRUCTURE\\CHATAPP.INFRASTRUCTURE.csproj|solutionrelative:chatapp.infrastructure\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ED8CABDF-E647-1664-9FA4-F26D3CDB13F9}|CHATAPP.INFRASTRUCTURE\\CHATAPP.INFRASTRUCTURE.csproj|e:\\chat_app\\backend\\chatapp.infrastructure\\repositories\\adminrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ED8CABDF-E647-1664-9FA4-F26D3CDB13F9}|CHATAPP.INFRASTRUCTURE\\CHATAPP.INFRASTRUCTURE.csproj|solutionrelative:chatapp.infrastructure\\repositories\\adminrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|e:\\chat_app\\backend\\chatapp.application\\interfaces\\iadminrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|solutionrelative:chatapp.application\\interfaces\\iadminrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ED8CABDF-E647-1664-9FA4-F26D3CDB13F9}|CHATAPP.INFRASTRUCTURE\\CHATAPP.INFRASTRUCTURE.csproj|e:\\chat_app\\backend\\chatapp.infrastructure\\data\\chatdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ED8CABDF-E647-1664-9FA4-F26D3CDB13F9}|CHATAPP.INFRASTRUCTURE\\CHATAPP.INFRASTRUCTURE.csproj|solutionrelative:chatapp.infrastructure\\data\\chatdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ED8CABDF-E647-1664-9FA4-F26D3CDB13F9}|CHATAPP.INFRASTRUCTURE\\CHATAPP.INFRASTRUCTURE.csproj|e:\\chat_app\\backend\\chatapp.infrastructure\\authentication\\jwttokengenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ED8CABDF-E647-1664-9FA4-F26D3CDB13F9}|CHATAPP.INFRASTRUCTURE\\CHATAPP.INFRASTRUCTURE.csproj|solutionrelative:chatapp.infrastructure\\authentication\\jwttokengenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|e:\\chat_app\\backend\\chatapp.application\\interfaces\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|solutionrelative:chatapp.application\\interfaces\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|e:\\chat_app\\backend\\chatapp.application\\interfaces\\iuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|solutionrelative:chatapp.application\\interfaces\\iuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|e:\\chat_app\\backend\\chatapp.application\\interfaces\\ionlineuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|solutionrelative:chatapp.application\\interfaces\\ionlineuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|e:\\chat_app\\backend\\chatapp.application\\interfaces\\imessageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|solutionrelative:chatapp.application\\interfaces\\imessageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|e:\\chat_app\\backend\\chatapp.application\\interfaces\\imessagerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|solutionrelative:chatapp.application\\interfaces\\imessagerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|e:\\chat_app\\backend\\chatapp.application\\interfaces\\iconversationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|solutionrelative:chatapp.application\\interfaces\\iconversationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|e:\\chat_app\\backend\\chatapp.application\\interfaces\\iconversationrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|solutionrelative:chatapp.application\\interfaces\\iconversationrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|e:\\chat_app\\backend\\chatapp.application\\interfaces\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|solutionrelative:chatapp.application\\interfaces\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|e:\\chat_app\\backend\\chatapp.application\\interfaces\\iadminservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|solutionrelative:chatapp.application\\interfaces\\iadminservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|e:\\chat_app\\backend\\chatapp.application\\dtos\\admin\\adminuserdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|solutionrelative:chatapp.application\\dtos\\admin\\adminuserdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ED8CABDF-E647-1664-9FA4-F26D3CDB13F9}|CHATAPP.INFRASTRUCTURE\\CHATAPP.INFRASTRUCTURE.csproj|e:\\chat_app\\backend\\chatapp.infrastructure\\migrations\\chatdbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ED8CABDF-E647-1664-9FA4-F26D3CDB13F9}|CHATAPP.INFRASTRUCTURE\\CHATAPP.INFRASTRUCTURE.csproj|solutionrelative:chatapp.infrastructure\\migrations\\chatdbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ED8CABDF-E647-1664-9FA4-F26D3CDB13F9}|CHATAPP.INFRASTRUCTURE\\CHATAPP.INFRASTRUCTURE.csproj|e:\\chat_app\\backend\\chatapp.infrastructure\\migrations\\20260701095942_addadminconversationflag.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ED8CABDF-E647-1664-9FA4-F26D3CDB13F9}|CHATAPP.INFRASTRUCTURE\\CHATAPP.INFRASTRUCTURE.csproj|solutionrelative:chatapp.infrastructure\\migrations\\20260701095942_addadminconversationflag.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|e:\\chat_app\\backend\\chatapp.application\\dtos\\admin\\changeroledto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|solutionrelative:chatapp.application\\dtos\\admin\\changeroledto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|e:\\chat_app\\backend\\chatapp.application\\dtos\\user\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|solutionrelative:chatapp.application\\dtos\\user\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|e:\\chat_app\\backend\\chatapp.application\\dtos\\admin\\userinfodto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{083BEB93-A798-4700-367E-B2C94EE01F68}|CHATAPP.APPLICATION\\CHATAPP.APPLICATION.csproj|solutionrelative:chatapp.application\\dtos\\admin\\userinfodto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9CEF99EE-DAC3-0C8D-0E5C-9C03AD73751A}|CHATAPP.WEBAPI\\CHATAPP.WEBAPI.csproj|e:\\chat_app\\backend\\chatapp.webapi\\chatapp.webapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{9CEF99EE-DAC3-0C8D-0E5C-9C03AD73751A}|CHATAPP.WEBAPI\\CHATAPP.WEBAPI.csproj|solutionrelative:chatapp.webapi\\chatapp.webapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 1,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedHeight": 410,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            }
+          ]
+        },
+        {
+          "DockedHeight": 449,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            }
+          ]
+        },
+        {
+          "DockedHeight": 8,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            }
+          ]
+        },
+        {
+          "DockedHeight": 152,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ChatHub.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.WEBAPI\\Hubs\\ChatHub.cs",
+              "RelativeDocumentMoniker": "CHATAPP.WEBAPI\\Hubs\\ChatHub.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.WEBAPI\\Hubs\\ChatHub.cs",
+              "RelativeToolTip": "CHATAPP.WEBAPI\\Hubs\\ChatHub.cs",
+              "ViewState": "AgIAAKAAAAAAAAAAAAAwwK8AAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-14T01:29:20.248Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ConversationService.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.INFRASTRUCTURE\\Services\\ConversationService.cs",
+              "RelativeDocumentMoniker": "CHATAPP.INFRASTRUCTURE\\Services\\ConversationService.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.INFRASTRUCTURE\\Services\\ConversationService.cs",
+              "RelativeToolTip": "CHATAPP.INFRASTRUCTURE\\Services\\ConversationService.cs",
+              "ViewState": "AgIAAJIAAAAAAAAAAAAgwEMAAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T06:44:52.888Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AdminRepository.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.INFRASTRUCTURE\\Repositories\\AdminRepository.cs",
+              "RelativeDocumentMoniker": "CHATAPP.INFRASTRUCTURE\\Repositories\\AdminRepository.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.INFRASTRUCTURE\\Repositories\\AdminRepository.cs",
+              "RelativeToolTip": "CHATAPP.INFRASTRUCTURE\\Repositories\\AdminRepository.cs",
+              "ViewState": "AgIAALcAAAAAAAAAAAAmwMcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T08:07:20.134Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "UserRepository.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.INFRASTRUCTURE\\Repositories\\UserRepository.cs",
+              "RelativeDocumentMoniker": "CHATAPP.INFRASTRUCTURE\\Repositories\\UserRepository.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.INFRASTRUCTURE\\Repositories\\UserRepository.cs",
+              "RelativeToolTip": "CHATAPP.INFRASTRUCTURE\\Repositories\\UserRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEEAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T09:47:05.227Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.WEBAPI\\Program.cs",
+              "RelativeDocumentMoniker": "CHATAPP.WEBAPI\\Program.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.WEBAPI\\Program.cs",
+              "RelativeToolTip": "CHATAPP.WEBAPI\\Program.cs",
+              "ViewState": "AgIAADoAAAAAAAAAAAAcwM4AAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T07:56:19.676Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IAdminRepository.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IAdminRepository.cs",
+              "RelativeDocumentMoniker": "CHATAPP.APPLICATION\\Interfaces\\IAdminRepository.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IAdminRepository.cs",
+              "RelativeToolTip": "CHATAPP.APPLICATION\\Interfaces\\IAdminRepository.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAswBIAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T10:45:35.096Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ChatDbContext.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.INFRASTRUCTURE\\Data\\ChatDbContext.cs",
+              "RelativeDocumentMoniker": "CHATAPP.INFRASTRUCTURE\\Data\\ChatDbContext.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.INFRASTRUCTURE\\Data\\ChatDbContext.cs",
+              "RelativeToolTip": "CHATAPP.INFRASTRUCTURE\\Data\\ChatDbContext.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-14T01:04:20.718Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "JwtTokenGenerator.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.INFRASTRUCTURE\\Authentication\\JwtTokenGenerator.cs",
+              "RelativeDocumentMoniker": "CHATAPP.INFRASTRUCTURE\\Authentication\\JwtTokenGenerator.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.INFRASTRUCTURE\\Authentication\\JwtTokenGenerator.cs",
+              "RelativeToolTip": "CHATAPP.INFRASTRUCTURE\\Authentication\\JwtTokenGenerator.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAmwCIAAAA1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T14:59:44.308Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "IMessageService.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IMessageService.cs",
+              "RelativeDocumentMoniker": "CHATAPP.APPLICATION\\Interfaces\\IMessageService.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IMessageService.cs",
+              "RelativeToolTip": "CHATAPP.APPLICATION\\Interfaces\\IMessageService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T14:59:25.752Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "IOnlineUserService.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IOnlineUserService.cs",
+              "RelativeDocumentMoniker": "CHATAPP.APPLICATION\\Interfaces\\IOnlineUserService.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IOnlineUserService.cs",
+              "RelativeToolTip": "CHATAPP.APPLICATION\\Interfaces\\IOnlineUserService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T14:59:26.844Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "IUserService.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IUserService.cs",
+              "RelativeDocumentMoniker": "CHATAPP.APPLICATION\\Interfaces\\IUserService.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IUserService.cs",
+              "RelativeToolTip": "CHATAPP.APPLICATION\\Interfaces\\IUserService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T14:59:29.542Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "IAuthService.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IAuthService.cs",
+              "RelativeDocumentMoniker": "CHATAPP.APPLICATION\\Interfaces\\IAuthService.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IAuthService.cs",
+              "RelativeToolTip": "CHATAPP.APPLICATION\\Interfaces\\IAuthService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T14:59:16.923Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "IConversationRepository.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IConversationRepository.cs",
+              "RelativeDocumentMoniker": "CHATAPP.APPLICATION\\Interfaces\\IConversationRepository.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IConversationRepository.cs",
+              "RelativeToolTip": "CHATAPP.APPLICATION\\Interfaces\\IConversationRepository.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAowA4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T06:43:00.102Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "IUserRepository.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IUserRepository.cs",
+              "RelativeDocumentMoniker": "CHATAPP.APPLICATION\\Interfaces\\IUserRepository.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IUserRepository.cs",
+              "RelativeToolTip": "CHATAPP.APPLICATION\\Interfaces\\IUserRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T09:46:57.616Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "IAdminService.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IAdminService.cs",
+              "RelativeDocumentMoniker": "CHATAPP.APPLICATION\\Interfaces\\IAdminService.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IAdminService.cs",
+              "RelativeToolTip": "CHATAPP.APPLICATION\\Interfaces\\IAdminService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T10:45:35.223Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "IConversationService.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IConversationService.cs",
+              "RelativeDocumentMoniker": "CHATAPP.APPLICATION\\Interfaces\\IConversationService.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IConversationService.cs",
+              "RelativeToolTip": "CHATAPP.APPLICATION\\Interfaces\\IConversationService.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAkwAwAAABEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T07:40:24.34Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "IMessageRepository.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IMessageRepository.cs",
+              "RelativeDocumentMoniker": "CHATAPP.APPLICATION\\Interfaces\\IMessageRepository.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\Interfaces\\IMessageRepository.cs",
+              "RelativeToolTip": "CHATAPP.APPLICATION\\Interfaces\\IMessageRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T10:45:35.487Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "AdminUserDto.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\DTOs\\Admin\\AdminUserDto.cs",
+              "RelativeDocumentMoniker": "CHATAPP.APPLICATION\\DTOs\\Admin\\AdminUserDto.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\DTOs\\Admin\\AdminUserDto.cs",
+              "RelativeToolTip": "CHATAPP.APPLICATION\\DTOs\\Admin\\AdminUserDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T14:58:56.597Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "ChatDbContextModelSnapshot.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.INFRASTRUCTURE\\Migrations\\ChatDbContextModelSnapshot.cs",
+              "RelativeDocumentMoniker": "CHATAPP.INFRASTRUCTURE\\Migrations\\ChatDbContextModelSnapshot.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.INFRASTRUCTURE\\Migrations\\ChatDbContextModelSnapshot.cs",
+              "RelativeToolTip": "CHATAPP.INFRASTRUCTURE\\Migrations\\ChatDbContextModelSnapshot.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T14:55:29.84Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "20260701095942_AddAdminConversationFlag.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.INFRASTRUCTURE\\Migrations\\20260701095942_AddAdminConversationFlag.cs",
+              "RelativeDocumentMoniker": "CHATAPP.INFRASTRUCTURE\\Migrations\\20260701095942_AddAdminConversationFlag.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.INFRASTRUCTURE\\Migrations\\20260701095942_AddAdminConversationFlag.cs",
+              "RelativeToolTip": "CHATAPP.INFRASTRUCTURE\\Migrations\\20260701095942_AddAdminConversationFlag.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAYwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T14:54:42.719Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "ChangeRoleDto.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\DTOs\\Admin\\ChangeRoleDto.cs",
+              "RelativeDocumentMoniker": "CHATAPP.APPLICATION\\DTOs\\Admin\\ChangeRoleDto.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\DTOs\\Admin\\ChangeRoleDto.cs",
+              "RelativeToolTip": "CHATAPP.APPLICATION\\DTOs\\Admin\\ChangeRoleDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T10:45:35.605Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "UserDto.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\DTOs\\User\\UserDto.cs",
+              "RelativeDocumentMoniker": "CHATAPP.APPLICATION\\DTOs\\User\\UserDto.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\DTOs\\User\\UserDto.cs",
+              "RelativeToolTip": "CHATAPP.APPLICATION\\DTOs\\User\\UserDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T09:45:35.766Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "UserInfoDto.cs",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\DTOs\\Admin\\UserInfoDto.cs",
+              "RelativeDocumentMoniker": "CHATAPP.APPLICATION\\DTOs\\Admin\\UserInfoDto.cs",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.APPLICATION\\DTOs\\Admin\\UserInfoDto.cs",
+              "RelativeToolTip": "CHATAPP.APPLICATION\\DTOs\\Admin\\UserInfoDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-13T09:45:08.091Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "CHATAPP.WEBAPI.csproj",
+              "DocumentMoniker": "E:\\CHAT_APP\\Backend\\CHATAPP.WEBAPI\\CHATAPP.WEBAPI.csproj",
+              "RelativeDocumentMoniker": "CHATAPP.WEBAPI\\CHATAPP.WEBAPI.csproj",
+              "ToolTip": "E:\\CHAT_APP\\Backend\\CHATAPP.WEBAPI\\CHATAPP.WEBAPI.csproj",
+              "RelativeToolTip": "CHATAPP.WEBAPI\\CHATAPP.WEBAPI.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-07-13T08:19:24.118Z"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:2:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

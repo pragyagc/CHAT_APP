@@ -65,17 +65,9 @@ public class ConversationService : IConversationService
         var otherIsAdmin =
             await _userManager.IsInRoleAsync(otherUser, "Admin");
 
-        //// User -> Admin ❌
-        //if (!currentIsAdmin && otherIsAdmin)
-        //    throw new UnauthorizedAccessException(
-        //        "Users cannot start conversations with administrators.");
+       
 
-        //// Admin -> Admin ❌
-        //if (currentIsAdmin && otherIsAdmin)
-        //    throw new UnauthorizedAccessException(
-        //        "Administrators cannot chat with each other.");
-
-        // Only block Admin -> Admin
+        //  Admin -> Admin
         if (currentIsAdmin && otherIsAdmin)
             throw new UnauthorizedAccessException(
                 "Administrators cannot chat with each other.");
